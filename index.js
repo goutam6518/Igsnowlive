@@ -1,10 +1,9 @@
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1./firebase-auth.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
 import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
 // Your Firebase configuration (the same as in your other files)
 const firebaseConfig = {
-  // Replace with your actual Firebase configuration
   apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
     authDomain: "igsfogstudio-df541.firebaseapp.com",
     projectId: "igsfogstudio-df541",
@@ -21,6 +20,7 @@ const db = getFirestore(app);
 
 const gameListContainer = document.getElementById('gameList');
 const privateSection = document.getElementById('privateSection');
+const beforeLoginSection = document.getElementById('beforeLoginSection');
 const adminEmail = 'gautamsingh77784@gmail.com'; // The admin's email
 
 async function displayUserUploadedGames(userId) {
@@ -68,6 +68,7 @@ async function displayUserUploadedGames(userId) {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         await displayUserUploadedGames(user.uid);
+        beforeLoginSection.classList.add('hidden'); // Hide after login
 
         // Check if the current user is the admin
         if (user.email === adminEmail) {
@@ -78,6 +79,7 @@ onAuthStateChanged(auth, async (user) => {
     } else {
         gameListContainer.textContent = 'Please log in to see your uploaded games.';
         privateSection.style.display = 'none';
+        beforeLoginSection.classList.remove('hidden'); // Show before login
     }
 });
 
