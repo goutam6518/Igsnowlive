@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGS - Home</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        nav {
+            background-color: #ddd;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        nav button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        nav button:hover {
+            background-color: #0056b3;
+        }
+
+        #gameList {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .game-item {
+            text-align: center;
+        }
+
+        .game-logo-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-button-container {
+            width: 80%;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .upload-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .upload-button:hover {
+            background-color: #1e7e34;
+        }
+
+        #privateSection {
+            background-color: #f9f9f9;
+            padding: 15px;
+            width: 100%;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            display: none; /* Hidden by default */
+        }
+
+        #privateSection.admin-only {
+            display: block;
+        }
+
+        #adminContent {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>IGS</header>
+
+    <nav>
+        <button onclick="location.reload()">Home</button>
+        <button onclick="window.location.href='games.html'">Games</button>
+        <button onclick="window.location.href='profile.html'">Profile</button>
+    </nav>
+
+    <div class="upload-button-container">
+        <button class="upload-button">Upload Game</button>
+    </div>
+
+    <div id="gameList">
+        <div class="game-item">
+            <div class="game-logo-container">
+                <img src="placeholder-game.png" alt="Game 1 Logo" class="game-logo">
+            </div>
+            <p>Game 1</p>
+            <p>By User 1</p>
+        </div>
+        <div class="game-item">
+            <div class="game-logo-container">
+                <img src="placeholder-game.png" alt="Game 2 Logo" class="game-logo">
+            </div>
+            <p>Game 2</p>
+            <p>By User 2</p>
+        </div>
+        </div>
+
+    <div id="privateSection">
+        <p>Private Section - Admin Only</p>
+        <div id="adminContent">
+            <p>Welcome, Admin!</p>
+            <button>Admin Action 1</button>
+            <button>Admin Action 2</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+        import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
+
+        // Your Firebase configuration (the same as in your other files)
+        const firebaseConfig = {
+          // Replace with your actual Firebase configuration
+          apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
+    authDomain: "igsfogstudio-df541.firebaseapp.com",
+    projectId: "igsfogstudio-df541",
+    storageBucket: "igsfogstudio-df541.firebasestorage.app",
+    messagingSenderId: "206722625476",
+    appId: "1:206722625476:web:c222830b5404f87bf57e91",
+    measurementId: "G-1JL82Z0FK0"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const gameListContainer = document.getElementById('gameList');
+        const privateSection = document.getElementById('privateSection');
+        const adminEmail = 'gautamsingh77784@gmail.com'; // The admin's email
+
+        async function displayUserUploadedGames(userId) {
+            gameListContainer.innerHTML = ''; // Clear existing games
+            try {
+                const gamesCollectionRef = collection(db, 'games'); // Assuming 'games' collection
+                const q = query(gamesCollectionRef, where('uploaderId', '==', userId), limit(10)); // Limit to 10 games
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        const game = doc.data();
+                        const gameItem = document.createElement('div');
+                        gameItem.classList.add('game-item');
+
+                        const logoContainer = document.createElement('div');
+                        logoContainer.classList.add('game-logo-container');
+                        const logoImg = document.createElement('img');
+                        logoImg.src = game.logoUrl || 'placeholder-game.png'; // Use actual logo URL
+                        logoImg.alt = game.name || 'Game Logo';
+                        logoImg.classList.add('game-logo');
+                        logoContainer.appendChild(logoImg);
+                        gameItem.appendChild(logoContainer);
+
+                        const gameName = document.createElement('p');
+                        gameName.textContent = game.name || 'Untitled Game';
+                        gameItem.appendChild(gameName);
+
+                        // Assuming you store uploader's name in the game document
+                        const userName = document.createElement('p');
+                        userName.textContent = `By ${game.uploaderName || 'Unknown User'}`;
+                        gameItem.appendChild(userName);
+
+                        gameListContainer.appendChild(gameItem);
+                    });
+                } else {
+                    gameListContainer.textContent = 'No games uploaded yet.';
+                }
+            } catch (error) {
+                console.error('Error fetching user uploaded games:', error);
+                gameListContainer.textContent = 'Failed to load games.';
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await displayUserUploadedGames(user.uid);
+
+                // Check if the current user is the admin
+                if (user.email === adminEmail) {
+                    privateSection.classList.add('admin-only');
+                } else {
+                    privateSection.style.display = 'none';
+                }
+            } else {
+                gameListContainer.textContent = 'Please log in to see your uploaded games.';
+                privateSection.style.display = 'none';
+            }
+        });
+
+        // Placeholder for upload button functionality
+        const uploadButton = document.querySelector('.upload-button');
+        uploadButton.addEventListener('click', () => {
+            alert('Upload functionality will be implemented here.');
+            // You would typically navigate to an upload page or trigger a modal
+        });
+    </script>
+</body>
+</html>
