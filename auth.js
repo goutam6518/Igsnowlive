@@ -1,118 +1,133 @@
-// Import the Firebase SDK (make sure you've added it to your HTML)
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
 
-// Your Firebase configuration
+// Your Firebase configuration (the same as in your other files)
 const firebaseConfig = {
-  // Replace with your actual Firebase configuration
   apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
     authDomain: "igsfogstudio-df541.firebaseapp.com",
     projectId: "igsfogstudio-df541",
     storageBucket: "igsfogstudio-df541.firebasestorage.app",
     messagingSenderId: "206722625476",
-    appId: "1:206722625476:web:9ab922dc4853418af57e91",
-    measurementId: "G-71VB7K6QS6"
+    appId: "1:206722625476:web:c222830b5404f87bf57e91",
+    measurementId: "G-1JL82Z0FK0"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Get DOM elements
-const signupContainer = document.getElementById('signup-container');
-const loginContainer = document.getElementById('login-container');
+// DOM Elements
+const loginSection = document.getElementById('loginSection');
+const createAccountSection = document.getElementById('createAccountSection');
+const switchToCreate = document.getElementById('switchToCreate');
 const switchToLogin = document.getElementById('switchToLogin');
-const switchToSignup = document.getElementById('switchToSignup');
-const signupForm = document.getElementById('signupForm');
-const loginForm = document.getElementById('loginForm');
-const signupErrorMessage = document.getElementById('signupErrorMessage');
-const loginErrorMessage = document.getElementById('loginErrorMessage');
-const signupPasswordInput = document.getElementById('signupPassword');
-const confirmPasswordInput = document.getElementById('confirmPassword');
+const loginButton = document.getElementById('loginButton');
+const createAccountButton = document.getElementById('createAccountButton');
+const errorMessage = document.getElementById('errorMessage');
+const createUsernameInput = document.getElementById('createUsername');
+const createEmailInput = document.getElementById('createEmail');
+const createPasswordInput = document.getElementById('createPassword');
+const loginEmailInput = document.getElementById('loginEmail');
+const loginPasswordInput = document.getElementById('loginPassword');
 
-// Function to switch between forms
-function showSignupForm() {
-    signupContainer.classList.add('active');
-    loginContainer.classList.remove('active');
+// Function to switch between login and create account forms
+function showLogin() {
+    loginSection.classList.add('active');
+    createAccountSection.classList.remove('active');
+    errorMessage.textContent = '';
 }
 
-function showLoginForm() {
-    loginContainer.classList.add('active');
-    signupContainer.classList.remove('active');
+function showCreateAccount() {
+    createAccountSection.classList.add('active');
+    loginSection.classList.remove('active');
+    errorMessage.textContent = '';
 }
 
 // Event listeners to switch forms
-switchToLogin.addEventListener('click', (e) => {
-    e.preventDefault();
-    showLoginForm();
-});
+switchToCreate.addEventListener('click', showCreateAccount);
+switchToLogin.addEventListener('click', showLogin);
 
-switchToSignup.addEventListener('click', (e) => {
-    e.preventDefault();
-    showSignupForm();
-});
+// Event listener for creating a new account
+createAccountButton.addEventListener('click', async () => {
+    const username = createUsernameInput.value.trim();
+    const email = createEmailInput.value.trim();
+    const password = createPasswordInput.value;
 
-// Handle signup form submission
-signupForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('signupEmail').value;
-    const password = signupPasswordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
-
-    if (password !== confirmPassword) {
-        signupErrorMessage.textContent = "Passwords do not match.";
+    if (!username || !email || !password) {
+        errorMessage.textContent = 'Please fill in all fields.';
         return;
     }
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        console.log("Account created:", user);
-        signupErrorMessage.textContent = "Account created successfully! You can now log in.";
-        signupForm.reset();
-        showLoginForm(); // Optionally switch to login form after successful signup
+
+        // Update user's display name (username)
+        await updateProfile(user, {
+            displayName: username
+        });
+
+        // Save additional user info to Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+            uid: user.uid,
+            userName: username,
+            email: email,
+            studioName: '' // Initialize other fields as needed
+            // profileLogoUrl will be handled in profile settings
+        });
+
+        errorMessage.textContent = 'Account created successfully! Redirecting...';
+        setTimeout(() => {
+            window.location.href = '/profile.html'; // Redirect to profile page
+        }, 1500);
+
     } catch (error) {
-        console.error("Error creating account:", error);
-        signupErrorMessage.textContent = getFirebaseErrorMessage(error.code);
+        errorMessage.textContent = getErrorMessage(error.code);
+        console.error('Error creating account:', error);
     }
 });
 
-// Handle login form submission
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+// Event listener for logging in
+loginButton.addEventListener('click', async () => {
+    const email = loginEmailInput.value.trim();
+    const password = loginPasswordInput.value;
+
+    if (!email || !password) {
+        errorMessage.textContent = 'Please enter your email and password.';
+        return;
+    }
 
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log("Logged in:", user);
-        loginErrorMessage.textContent = "Logged in successfully!";
-        // Redirect to your application's main page here
-        window.location.href = '/index.html'; // Replace with your actual dashboard URL
+        await signInWithEmailAndPassword(auth, email, password);
+        errorMessage.textContent = 'Logged in successfully! Redirecting...';
+        setTimeout(() => {
+            window.location.href = '/profile.html'; // Redirect to profile page
+        }, 1500);
     } catch (error) {
-        console.error("Error logging in:", error);
-        loginErrorMessage.textContent = getFirebaseErrorMessage(error.code);
+        errorMessage.textContent = getErrorMessage(error.code);
+        console.error('Error logging in:', error);
     }
 });
 
-// Function to get user-friendly Firebase error messages
-function getFirebaseErrorMessage(errorCode) {
+// Function to get a user-friendly error message
+function getErrorMessage(errorCode) {
     switch (errorCode) {
         case 'auth/email-already-in-use':
-            return 'The email address is already in use by another account.';
+            return 'Email address is already in use.';
         case 'auth/invalid-email':
-            return 'The email address is not valid.';
+            return 'Invalid email address.';
         case 'auth/weak-password':
-            return 'The password is too weak.';
+            return 'Password should be at least 6 characters.';
         case 'auth/wrong-password':
-            return 'The password you entered is incorrect.';
+            return 'Incorrect password.';
         case 'auth/user-not-found':
-            return 'There is no user record corresponding to this email.';
+            return 'User not found with this email.';
         default:
-            return 'An error occurred. Please try again later.';
+            return 'An error occurred. Please try again.';
     }
 }
 
-// Initially show the signup form
-showSignupForm();
+// Initially show the login form
+showLogin();
