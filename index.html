@@ -128,7 +128,7 @@
     </nav>
 
     <div class="upload-button-container">
-        <button class="upload-button">Upload Game</button>
+        <button class="upload-button" onclick="window.location.href='upload.html'">Upload Game</button>
     </div>
 
     <div id="gameList">
@@ -154,7 +154,7 @@
 
     <script type="module">
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-        import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+        import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
         // Your Firebase configuration (the same as in your other files)
@@ -178,12 +178,11 @@
         const privateSection = document.getElementById('privateSection');
         const adminEmail = 'gautamsingh77784@gmail.com'; // The admin's email
 
-        async function displayUserUploadedGames(userId) {
+        async function displayAllUploadedGames() {
             gameListContainer.innerHTML = ''; // Clear existing games
             try {
                 const gamesCollectionRef = collection(db, 'games'); // Assuming 'games' collection
-                const q = query(gamesCollectionRef, where('uploaderId', '==', userId), limit(10)); // Limit to 10 games
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await getDocs(gamesCollectionRef);
 
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((doc) => {
@@ -194,14 +193,14 @@
                         const logoContainer = document.createElement('div');
                         logoContainer.classList.add('game-logo-container');
                         const logoImg = document.createElement('img');
-                        logoImg.src = game.logoUrl || 'placeholder-game.png'; // Use actual logo URL
-                        logoImg.alt = game.name || 'Game Logo';
+                        logoImg.src = game.gameLogoUrl || 'placeholder-game.png'; // Use actual logo URL
+                        logoImg.alt = game.gameName || 'Game Logo';
                         logoImg.classList.add('game-logo');
                         logoContainer.appendChild(logoImg);
                         gameItem.appendChild(logoContainer);
 
                         const gameName = document.createElement('p');
-                        gameName.textContent = game.name || 'Untitled Game';
+                        gameName.textContent = game.gameName || 'Untitled Game';
                         gameItem.appendChild(gameName);
 
                         // Assuming you store uploader's name in the game document
@@ -215,15 +214,15 @@
                     gameListContainer.textContent = 'No games uploaded yet.';
                 }
             } catch (error) {
-                console.error('Error fetching user uploaded games:', error);
+                console.error('Error fetching all uploaded games:', error);
                 gameListContainer.textContent = 'Failed to load games.';
             }
         }
 
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await displayUserUploadedGames(user.uid);
+            await displayAllUploadedGames(); // Display all games for everyone
 
+            if (user) {
                 // Check if the current user is the admin
                 if (user.email === adminEmail) {
                     privateSection.classList.add('admin-only');
@@ -231,17 +230,11 @@
                     privateSection.style.display = 'none';
                 }
             } else {
-                gameListContainer.textContent = 'Please log in to see your uploaded games.';
                 privateSection.style.display = 'none';
             }
         });
 
-        // Placeholder for upload button functionality
-        const uploadButton = document.querySelector('.upload-button');
-        uploadButton.addEventListener('click', () => {
-            alert('Upload functionality will be implemented here.');
-            // You would typically navigate to an upload page or trigger a modal
-        });
+        // The upload button now has an onclick handler in the HTML
     </script>
 </body>
 </html>
