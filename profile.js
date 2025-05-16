@@ -151,6 +151,9 @@ saveProfileButton.addEventListener('click', async () => {
     }
 });
 
+    }
+});
+
 // Event listener for profile logo upload
 profileLogoInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
