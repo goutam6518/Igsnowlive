@@ -3,56 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Game - Admin Only</title>
+    <title>Upload Game</title>
     <style>
         body {
             font-family: sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             min-height: 100vh;
         }
 
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto 80px auto; /* Adjusted for bottom bar */
         }
 
         h2 {
             text-align: center;
             margin-bottom: 20px;
-            color: #333;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #555;
             font-weight: bold;
+            margin-bottom: 5px;
         }
 
         input[type="text"],
         input[type="file"] {
-            width: calc(100% - 22px);
+            width: calc(100% - 12px);
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
-            font-size: 1em;
         }
 
         button {
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             padding: 12px 20px;
             border: none;
@@ -63,148 +56,182 @@
         }
 
         button:hover {
-            background-color: #1e7e34;
+            background-color: #0056b3;
         }
 
-        .error-message {
-            color: red;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-
-        #adminAccessDenied {
-            color: red;
-            text-align: center;
+        #message {
             margin-top: 20px;
-            font-size: 1.2em;
-            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+        /* Bottom Bar Styles */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f8f8f8;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .bottom-button {
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 1em;
+            cursor: pointer;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        .bottom-button:hover {
+            color: #007bff;
         }
 
         #uploadForm {
-            display: none; /* Hidden by default until admin is verified */
+            display: none; /* Initially hidden for non-logged-in users */
         }
 
-        #uploadForm.admin-only {
-            display: block;
+        #loginMessage {
+            text-align: center;
+            margin-top: 20px;
+            color: orange;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Upload New Game (Admin Only)</h2>
-        <div id="adminAccessDenied">
-            Access Denied. Only administrators can upload games.
-        </div>
+        <h2>Upload Your Game</h2>
+        <div id="loginMessage">Checking login status...</div>
         <form id="uploadForm">
             <div class="form-group">
                 <label for="gameName">Game Name:</label>
                 <input type="text" id="gameName" required>
             </div>
             <div class="form-group">
-                <label for="studioName">Studio Name:</label>
-                <input type="text" id="studioName" required>
-            </div>
-            <div class="form-group">
-                <label for="apkFile">Upload APK File:</label>
-                <input type="file" id="apkFile" accept=".apk" required>
-            </div>
-            <div class="form-group">
-                <label for="gameLogo">Upload Game Logo:</label>
+                <label for="gameLogo">Game Logo (Image):</label>
                 <input type="file" id="gameLogo" accept="image/*" required>
             </div>
-            <button type="submit">Upload Game</button>
-            <div id="uploadErrorMessage" class="error-message"></div>
+            <div class="form-group">
+                <label for="gameApk">Game APK File:</label>
+                <input type="file" id="gameApk" accept=".apk" required>
+            </div>
+            <button type="button" id="uploadButton">Upload Game</button>
+            <div id="message"></div>
         </form>
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="bottom-button">Home</a>
+        <a href="profile.html" class="bottom-button">Profile</a>
     </div>
 
     <script type="module">
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, addDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
         import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-storage.js';
-        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
-        // Your Firebase configuration (the same as in your other files)
+        // Your Firebase configuration
         const firebaseConfig = {
           apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
-    authDomain: "igsfogstudio-df541.firebaseapp.com",
-    projectId: "igsfogstudio-df541",
-    storageBucket: "igsfogstudio-df541.firebasestorage.app",
-    messagingSenderId: "206722625476",
-    appId: "1:206722625476:web:c222830b5404f87bf57e91",
-    measurementId: "G-1JL82Z0FK0"
+            authDomain: "igsfogstudio-df541.firebaseapp.com",
+            projectId: "igsfogstudio-df541",
+            storageBucket: "igsfogstudio-df541.firebasestorage.app",
+            messagingSenderId: "206722625476",
+            appId: "1:206722625476:web:c222830b5404f87bf57e91",
+            measurementId: "G-1JL82Z0FK0"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const storage = getStorage(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
+        // DOM Elements
         const uploadForm = document.getElementById('uploadForm');
-        const adminAccessDenied = document.getElementById('adminAccessDenied');
-        const uploadErrorMessage = document.getElementById('uploadErrorMessage');
-        const adminEmail = 'gautamsingh77784@gmail.com';
+        const gameNameInput = document.getElementById('gameName');
+        const gameLogoInput = document.getElementById('gameLogo');
+        const gameApkInput = document.getElementById('gameApk');
+        const uploadButton = document.getElementById('uploadButton');
+        const messageDiv = document.getElementById('message');
+        const loginMessageDiv = document.getElementById('loginMessage');
 
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email === adminEmail) {
-                uploadForm.classList.add('admin-only');
-                adminAccessDenied.style.display = 'none';
-            } else {
-                uploadForm.style.display = 'none';
-                adminAccessDenied.style.display = 'block';
-            }
-        });
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loginMessageDiv.style.display = 'none';
+                uploadForm.style.display = 'block';
 
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+                uploadButton.addEventListener('click', async () => {
+                    const gameName = gameNameInput.value.trim();
+                    const gameLogoFile = gameLogoInput.files[0];
+                    const gameApkFile = gameApkInput.files[0];
 
-            const gameName = document.getElementById('gameName').value.trim();
-            const studioName = document.getElementById('studioName').value.trim();
-            const apkFile = document.getElementById('apkFile').files[0];
-            const gameLogoFile = document.getElementById('gameLogo').files[0];
+                    if (!gameName || !gameLogoFile || !gameApkFile) {
+                        messageDiv.textContent = 'Please fill in all fields.';
+                        messageDiv.className = 'error';
+                        return;
+                    }
 
-            if (!gameName || !studioName || !apkFile || !gameLogoFile) {
-                uploadErrorMessage.textContent = 'Please fill in all fields.';
-                return;
-            }
+                    try {
+                        messageDiv.textContent = 'Uploading...';
+                        messageDiv.className = '';
 
-            uploadErrorMessage.textContent = 'Uploading...';
+                        // Upload logo to Firebase Storage
+                        const logoStorageRef = ref(storage, `games/${user.uid}/${gameName}/logo/${gameLogoFile.name}`);
+                        const logoSnapshot = await uploadBytes(logoStorageRef, gameLogoFile);
+                        const logoURL = await getDownloadURL(logoSnapshot.ref);
 
-            try {
-                const user = auth.currentUser;
-                if (!user) {
-                    uploadErrorMessage.textContent = 'User not authenticated.';
-                    return;
-                }
+                        // Upload APK to Firebase Storage
+                        const apkStorageRef = ref(storage, `games/${user.uid}/${gameName}/apk/${gameApkFile.name}`);
+                        const apkSnapshot = await uploadBytes(apkStorageRef, gameApkFile);
+                        const apkURL = await getDownloadURL(apkSnapshot.ref);
 
-                const apkStorageRef = ref(storage, `games/apk/${gameName}-${Date.now()}.apk`);
-                const logoStorageRef = ref(storage, `games/logo/${gameName}-${Date.now()}-logo.${gameLogoFile.type.split('/')[1]}`);
+                        // Save game details to Firestore
+                        const gamesCollectionRef = collection(db, 'games');
+                        const newGameRef = await addDoc(gamesCollectionRef, {
+                            uploaderId: user.uid,
+                            gameName: gameName,
+                            gameLogoUrl: logoURL,
+                            gameApkUrl: apkURL,
+                            uploadDate: new Date(),
+                            // Add other relevant game details here
+                        });
 
-                const [apkSnapshot, logoSnapshot] = await Promise.all([
-                    uploadBytes(apkStorageRef, apkFile),
-                    uploadBytes(logoStorageRef, gameLogoFile)
-                ]);
+                        // Optionally, update user's profile with the uploaded game ID
+                        const userDocRef = doc(db, 'users', user.uid);
+                        const userDocSnap = await getDoc(userDocRef);
+                        if (userDocSnap.exists() && userDocSnap.data()) {
+                            const uploadedGames = userDocSnap.data().uploadedGames || [];
+                            uploadedGames.push(newGameRef.id);
+                            await updateDoc(userDocRef, { uploadedGames: uploadedGames });
+                        }
 
-                const [apkUrl, logoUrl] = await Promise.all([
-                    getDownloadURL(apkSnapshot.ref),
-                    getDownloadURL(logoSnapshot.ref)
-                ]);
-
-                await addDoc(collection(db, 'games'), {
-                    name: gameName,
-                    studioName: studioName,
-                    apkUrl: apkUrl,
-                    logoUrl: logoUrl,
-                    uploaderId: user.uid,
-                    uploaderName: user.displayName || user.email, // Or fetch from profile
-                    uploadDate: serverTimestamp()
+                        messageDiv.textContent = 'Game uploaded successfully!';
+                        messageDiv.className = 'success';
+                        uploadForm.reset(); // Clear the form
+                    } catch (error) {
+                        console.error('Error uploading game:', error);
+                        messageDiv.textContent = 'Error uploading game.';
+                        messageDiv.className = 'error';
+                    }
                 });
-
-                uploadForm.reset();
-                uploadErrorMessage.textContent = 'Game uploaded successfully!';
-            } catch (error) {
-                console.error('Error uploading game:', error);
-                uploadErrorMessage.textContent = `Upload failed: ${error.message}`;
+            } else {
+                loginMessageDiv.textContent = 'You need to be logged in to upload games.';
+                uploadForm.style.display = 'none';
             }
         });
     </script>
