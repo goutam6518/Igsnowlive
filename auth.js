@@ -78,10 +78,16 @@ createAccountButton.addEventListener('click', async () => {
             // profileLogoUrl will be handled in profile settings
         });
 
-        errorMessage.textContent = 'Account created successfully! Redirecting...';
-        setTimeout(() => {
-            window.location.href = 'profile.html'; // Redirect to profile page
-        }, 1500);
+        try {
+    await signInWithEmailAndPassword(auth, email, password);
+    errorMessage.textContent = 'Logged in successfully! Redirecting...';
+    setTimeout(() => {
+        window.location.href = 'profile.html'; // Changed the path here
+    }, 1500);
+} catch (error) {
+    // ... error handling ...
+}
+
 
     } catch (error) {
         errorMessage.textContent = getErrorMessage(error.code);
