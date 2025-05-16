@@ -141,10 +141,13 @@ saveProfileButton.addEventListener('click', async () => {
             alert('Profile updated successfully!');
         } catch (error) {
             console.error('Error updating profile:', error);
-            alert('Error updating profile.');
+            alert('Error updating profile.'); // This is the alert you're seeing
         }
     } else {
         alert('Not logged in.');
+    }
+});
+
     }
 });
 
