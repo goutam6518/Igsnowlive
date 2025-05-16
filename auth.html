@@ -242,15 +242,11 @@
             }
 
             try {
-    await signInWithEmailAndPassword(auth, email, password);
-    errorMessage.textContent = 'Logged in successfully! Redirecting...';
-    setTimeout(() => {
-        window.location.href = '/profile.html'; // This line redirects to profile.html
-    }, 1500);
-} catch (error) {
-    // ... error handling ...
-}
-
+                await signInWithEmailAndPassword(auth, email, password);
+                errorMessage.textContent = 'Logged in successfully! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = '/profile.html'; // Redirect to profile page
+                }, 1500);
             } catch (error) {
                 errorMessage.textContent = getErrorMessage(error.code);
                 console.error('Error logging in:', error);
