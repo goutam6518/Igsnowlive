@@ -80,7 +80,7 @@ createAccountButton.addEventListener('click', async () => {
 
         errorMessage.textContent = 'Account created successfully! Redirecting...';
         setTimeout(() => {
-            window.location.href = '/profile.html'; // Redirect to profile page
+            window.location.href = 'profile.html'; // Redirect to profile page
         }, 1500);
 
     } catch (error) {
