@@ -17,7 +17,7 @@
 
         header {
             background-color: #333;
-            color: #fff;
+            color: white;
             padding: 20px;
             width: 100%;
             text-align: center;
@@ -43,7 +43,7 @@
         }
 
         nav button:hover {
-            background-color:
+            background-color: #0056b3;
         }
 
         #gameList {
@@ -61,6 +61,7 @@
 
         .game-item {
             text-align: center;
+            cursor: pointer; /* Make game items clickable */
         }
 
         .game-logo-container {
@@ -72,6 +73,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 5px;
         }
 
         .game-logo {
@@ -132,34 +134,22 @@
     </div>
 
     <div id="gameList">
-        <div class="game-item">
-            <div class="game-logo-container">
-                <img src="placeholder-game.png" alt="Game 1 Logo" class="game-logo">
-            </div>
-            <p>Game 1</p>
-            <p>By User 1</p>
-        </div>
-        <div class="game-item">
-            <div class="game-logo-container">
-                <img src="placeholder-game.png" alt="Game 2 Logo" class="game-logo">
-            </div>
-            <p>Game 2</p>
-            <p>By User 2</p>
-        </div>
         </div>
 
-
-        </div>
+    <div id="privateSection">
+        <h2>Admin Section</h2>
+        <div id="adminContent">
+            <p>This section is only visible to the admin.</p>
+            </div>
     </div>
 
     <script type="module">
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-        import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
-        // Your Firebase configuration (the same as in your other files)
+        // Your Firebase configuration (replace with your actual config)
         const firebaseConfig = {
-          // Replace with your actual Firebase configuration
           apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
     authDomain: "igsfogstudio-df541.firebaseapp.com",
     projectId: "igsfogstudio-df541",
@@ -178,10 +168,10 @@
         const privateSection = document.getElementById('privateSection');
         const adminEmail = 'gautamsingh77784@gmail.com'; // The admin's email
 
-        async function displayAllUploadedGames() {
+        async function displayAllGames() {
             gameListContainer.innerHTML = ''; // Clear existing games
             try {
-                const gamesCollectionRef = collection(db, 'games'); // Assuming 'games' collection
+                const gamesCollectionRef = collection(db, 'games');
                 const querySnapshot = await getDocs(gamesCollectionRef);
 
                 if (!querySnapshot.empty) {
@@ -189,11 +179,14 @@
                         const game = doc.data();
                         const gameItem = document.createElement('div');
                         gameItem.classList.add('game-item');
+                        gameItem.addEventListener('click', () => {
+                            window.location.href = `game.html?id=${doc.id}`;
+                        });
 
                         const logoContainer = document.createElement('div');
                         logoContainer.classList.add('game-logo-container');
                         const logoImg = document.createElement('img');
-                        logoImg.src = game.gameLogoUrl || 'placeholder-game.png'; // Use actual logo URL
+                        logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
                         logoImg.alt = game.gameName || 'Game Logo';
                         logoImg.classList.add('game-logo');
                         logoContainer.appendChild(logoImg);
@@ -214,13 +207,13 @@
                     gameListContainer.textContent = 'No games uploaded yet.';
                 }
             } catch (error) {
-                console.error('Error fetching all uploaded games:', error);
+                console.error('Error fetching games:', error);
                 gameListContainer.textContent = 'Failed to load games.';
             }
         }
 
         onAuthStateChanged(auth, async (user) => {
-            await displayAllUploadedGames(); // Display all games for everyone
+            await displayAllGames(); // Display all games for everyone
 
             if (user) {
                 // Check if the current user is the admin
@@ -233,8 +226,6 @@
                 privateSection.style.display = 'none';
             }
         });
-
-        // The upload button now has an onclick handler in the HTML
     </script>
 </body>
 </html>
