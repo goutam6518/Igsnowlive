@@ -112,7 +112,7 @@
     </div>
 
     <script type="module">
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+        import { getFirestore,collection, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
         // Your Firebase configuration (replace with your actual config)
@@ -132,6 +132,7 @@
         const db = getFirestore(app);
 
         document.addEventListener('DOMContentLoaded', async () => {
+            
             const gameLogo = document.getElementById('gameLogoUrl');
             const gameNameElement = document.getElementById('gameName');
             const uploaderNameElement = document.getElementById('uploaderName');
