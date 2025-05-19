@@ -194,11 +194,11 @@
             if (gameId) {
                 try {
                     const gamesCollectionRef = collection(db, 'games');
-                const querySnapshot = await getDocs(gamesCollectionRef);
+                const gamescollectionSnap = await getDocs(gamesCollectionRef);
                     const gameDocRef = doc(db, 'games', gameId);
                     const gameDocSnap = await getDoc(gameDocRef);
 
-                    if (gameDocSnap.exists()) {
+                    if (gameDocSnap,gamescollectionSnap.exists()) {
                         const gameData = gameDocSnap.data();
 
                         gameLogoElement.src = gameData.gameLogoUrl || 'placeholder-game.png';
