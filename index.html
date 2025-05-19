@@ -174,7 +174,7 @@
         async function displayAllGames() {
             gameListContainer.innerHTML = ''; // Clear existing games
             try {
-                const gamesCollectionRef = collection(db, 'gamed');
+                const gamesCollectionRef = collection(db, 'games');
                 const querySnapshot = await getDocs(gamesCollectionRef);
 
                 if (!querySnapshot.empty) {
