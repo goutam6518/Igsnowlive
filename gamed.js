@@ -34,7 +34,7 @@
 
         if (gameId) {
             try {
-                const gameDocRef = doc(db, 'games', gameId);
+                const gameDocRef = doc(db, 'gamed', gameId);
                 const gameDocSnap = await getDoc(gameDocRef);
 
                 if (gameDocSnap.exists()) {
