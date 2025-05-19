@@ -26,7 +26,7 @@ const adminEmail = 'gautamsingh77784@gmail.com'; // The admin's email
 async function displayUserUploadedGames(userId) {
     gameListContainer.innerHTML = ''; // Clear existing games
     try {
-        const gamesCollectionRef = collection(db, 'gamed'); // Assuming 'games' collection
+        const gamesCollectionRef = collection(db, 'games'); // Assuming 'games' collection
         const q = query(gamesCollectionRef, where('uploaderId', '==', userId), limit(10)); // Limit to 10 games
         const querySnapshot = await getDocs(q);
 
