@@ -193,6 +193,8 @@
 
             if (gameId) {
                 try {
+                    const gamesCollectionRef = collection(db, 'games');
+                const querySnapshot = await getDocs(gamesCollectionRef);
                     const gameDocRef = doc(db, 'games', gameId);
                     const gameDocSnap = await getDoc(gameDocRef);
 
