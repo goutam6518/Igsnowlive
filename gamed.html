@@ -165,8 +165,11 @@
                             uploaderNameElement.textContent = 'Unknown User';
                         }
 
-                        downloadLink.href = gameData.gameApkUrl || '#'; // Set the actual download URL
-                        downloadLink.download = (gameData.gameName || 'game').toLowerCase().replace(/ /g, '_') + ".apk";
+                        // Set the download URL from Firebase to the download button
+                        downloadLink.href = gameData.downloadUrl || '#';
+                        downloadLink.target = '_blank'; // Optional: Open in a new tab
+                        downloadLink.download = (gameData.gameName || 'game').toLowerCase().replace(/ /g, '_');
+
                     } else {
                         console.log('No such game!');
                         const container = document.querySelector('.container');
