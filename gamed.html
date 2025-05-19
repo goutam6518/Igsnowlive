@@ -140,6 +140,7 @@
 
             // Function to get the game ID from the URL query parameters
             function getGameIdFromUrl() {
+                
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get('id');
             }
@@ -148,6 +149,7 @@
 
             if (gameId) {
                 try {
+                    const gamesCollectionRef = collection(db, 'games');
                     const gameDocRef = doc(db, 'games', gameId);
                     const gameDocSnap = await getDoc(gameDocRef);
 
