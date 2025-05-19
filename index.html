@@ -181,7 +181,7 @@
                     querySnapshot.forEach((doc) => {
                         const game = doc.data();
                         const gameItem = document.createElement('a'); // Changed to 'a' tag
-                        gameItem.href = `game.html?id=${doc.id}`; // Set the link directly
+                        gameItem.href = "game.html?id=${doc.id}"; // Set the link directly
                         gameItem.classList.add('game-item');
                         gameItem.style.textDecoration = 'none'; // Remove link underline
                         gameItem.style.color = 'inherit'; // Inherit text color
