@@ -13,7 +13,7 @@
             min-height: 100vh;
             background-color: #f4f4f4;
             align-items: center;
-            padding-bottom: 60px; /* Space for the fixed bottom bar */
+            padding-bottom: 120px; /* Adjusted for video and bottom bar */
         }
 
         .container {
@@ -49,23 +49,55 @@
             margin-bottom: 10px;
         }
 
-        p {
-            margin-bottom: 15px;
+        .detail-item {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .detail-item strong {
+            font-weight: bold;
+            margin-right: 5px;
         }
 
         .download-button {
             padding: 12px 24px;
-            background-color: #007bff;
+            background-color: #28a745; /* More standard success color */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
             text-decoration: none;
+            margin-top: 20px;
+            display: inline-block; /* To allow for potential styling */
         }
 
         .download-button:hover {
-            background-color: #0056b3;
+            background-color: #1e7e34;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 15px;
+        }
+
+        .loading-indicator {
+            color: #555;
+            margin-top: 15px;
+        }
+
+        .video-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+
+        .video-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         /* Bottom Bar Styles */
@@ -101,9 +133,19 @@
         <div class="game-logo-container">
             <img src="placeholder-game.png" alt="Game Logo" class="game-logo" id="gameLogo">
         </div>
-        <h1 id="gameName">Game Title</h1>
-        <p>Uploaded by: <span id="uploaderName">User Name</span></p>
-        <a href="#" class="download-button" id="downloadLink">Download Game</a>
+        <h1 id="gameName">Loading Game Title...</h1>
+        <p class="detail-item"><strong>Uploaded by:</strong> <span id="uploaderName"></span></p>
+
+        <div id="videoPlaceholder" style="display: none;">
+            <h2>Game Trailer</h2>
+            <div class="video-container">
+                <iframe id="trailerVideo" class="video-iframe" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <a href="#" class="download-button" id="downloadLink" style="display: none;">Download Game</a>
+        <p id="errorMessage" class="error-message" style="display: none;">Failed to load game details.</p>
+        <p id="loadingMessage" class="loading-indicator">Loading game details...</p>
     </div>
 
     <div class="bottom-bar">
@@ -112,7 +154,7 @@
     </div>
 
     <script type="module">
-        import { getFirestore,collection, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
         // Your Firebase configuration (replace with your actual config)
@@ -132,15 +174,17 @@
         const db = getFirestore(app);
 
         document.addEventListener('DOMContentLoaded', async () => {
-            
-            const gameLogo = document.getElementById('gameLogoUrl');
+            const gameLogoElement = document.getElementById('gameLogo');
             const gameNameElement = document.getElementById('gameName');
             const uploaderNameElement = document.getElementById('uploaderName');
-            const downloadLink = document.getElementById('downloadLink');
+            const downloadLinkElement = document.getElementById('downloadLink');
+            const trailerVideoElement = document.getElementById('trailerVideo');
+            const videoPlaceholderElement = document.getElementById('videoPlaceholder');
+            const errorMessageElement = document.getElementById('errorMessage');
+            const loadingMessageElement = document.getElementById('loadingMessage');
 
             // Function to get the game ID from the URL query parameters
             function getGameIdFromUrl() {
-                
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get('id');
             }
@@ -149,47 +193,63 @@
 
             if (gameId) {
                 try {
-                    const gamesCollectionRef = collection(db, 'games');
                     const gameDocRef = doc(db, 'games', gameId);
                     const gameDocSnap = await getDoc(gameDocRef);
 
                     if (gameDocSnap.exists()) {
                         const gameData = gameDocSnap.data();
 
-                        gameLogo.src = gameData.gameLogoUrl || 'placeholder-game.png';
-                        gameLogo.alt = gameData.gameName + " Logo";
+                        gameLogoElement.src = gameData.gameLogoUrl || 'placeholder-game.png';
+                        gameLogoElement.alt = gameData.gameName + " Logo";
                         gameNameElement.textContent = gameData.gameName || 'Untitled Game';
+                        uploaderNameElement.textContent = gameData.uploaderName || 'Unknown User';
 
-                        // Fetch uploader's username from the 'users' collection
-                        const userDocRef = doc(db, 'users', gameData.uploaderId);
-                        const userDocSnap = await getDoc(userDocRef);
-                        if (userDocSnap.exists() && userDocSnap.data().userName) {
-                            uploaderNameElement.textContent = userDocSnap.data().userName;
+                        downloadLinkElement.href = gameData.downloadUrl || '#';
+                        downloadLinkElement.target = '_blank';
+                        downloadLinkElement.download = (gameData.gameName || 'game').toLowerCase().replace(/ /g, '_');
+
+                        if (gameData.trailerVideoLink) {
+                            trailerVideoElement.src = `https://www.youtube.com/embed/${getYoutubeVideoId(gameData.trailerVideoLink)}`;
+                            videoPlaceholderElement.style.display = 'block';
                         } else {
-                            uploaderNameElement.textContent = 'Unknown User';
+                            videoPlaceholderElement.style.display = 'none';
                         }
 
-                        // Set the download URL from Firebase to the download button
-                        downloadLink.href = gameData.downloadUrl || '#';
-                        downloadLink.target = '_blank'; // Optional: Open in a new tab
-                        downloadLink.download = (gameData.gameName || 'game').toLowerCase().replace(/ /g, '_');
+                        // Show content and hide loading/error
+                        downloadLinkElement.style.display = 'inline-block';
+                        loadingMessageElement.style.display = 'none';
+                        errorMessageElement.style.display = 'none';
 
                     } else {
                         console.log('No such game!');
-                        const container = document.querySelector('.container');
-                        container.innerHTML = '<p>Game not found!</p>';
+                        loadingMessageElement.style.display = 'none';
+                        errorMessageElement.textContent = 'Game not found!';
+                        errorMessageElement.style.display = 'block';
+                        gameNameElement.textContent = 'Game Not Found';
+                        videoPlaceholderElement.style.display = 'none';
                     }
                 } catch (error) {
                     console.error('Error fetching game data:', error);
-                    const container = document.querySelector('.container');
-                    container.innerHTML = '<p>Failed to load game details.</p>';
+                    loadingMessageElement.style.display = 'none';
+                    errorMessageElement.style.display = 'block';
+                    gameNameElement.textContent = 'Error Loading Game';
+                    videoPlaceholderElement.style.display = 'none';
                 }
             } else {
                 console.log('No game ID specified in the URL.');
-                const container = document.querySelector('.container');
-                container.innerHTML = '<p>No game selected.</p>';
+                loadingMessageElement.style.display = 'none';
+                errorMessageElement.textContent = 'No game selected.';
+                errorMessageElement.style.display = 'block';
+                gameNameElement.textContent = 'No Game Selected';
+                videoPlaceholderElement.style.display = 'none';
             }
         });
+
+        function getYoutubeVideoId(url) {
+            const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
     </script>
 </body>
 </html>
