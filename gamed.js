@@ -1,5 +1,5 @@
-<script type="module">
-    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
+
+    import { getFirestore,collection, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
 
     // Your Firebase configuration (replace with your actual config)
@@ -34,7 +34,7 @@
 
         if (gameId) {
             try {
-                const gameDocRef = doc(db, 'gamed', gameId);
+                const gameDocRef = doc(db, 'games', gameId);
                 const gameDocSnap = await getDoc(gameDocRef);
 
                 if (gameDocSnap.exists()) {
