@@ -61,7 +61,9 @@
 
         .game-item {
             text-align: center;
-            cursor: pointer; /* Make game items clickable */
+            cursor: pointer;
+            text-decoration: none; /* To remove default link styling */
+            color: inherit; /* To inherit text color from parent */
         }
 
         .game-logo-container {
@@ -144,9 +146,9 @@
     </div>
 
     <script type="module">
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js';
-        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
 
         // Your Firebase configuration (replace with your actual config)
         const firebaseConfig = {
@@ -178,12 +180,11 @@
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((doc) => {
                         const game = doc.data();
-                        const gameItem = document.createElement('div');
+                        const gameItem = document.createElement('a'); // Changed to 'a' tag
+                        gameItem.href = `game.html?id=${doc.id}`; // Set the link directly
                         gameItem.classList.add('game-item');
-                        gameItem.addEventListener('click', () => {
-                            <a href="game.html?id=${doc.id}">...</a>
-
-                        });
+                        gameItem.style.textDecoration = 'none'; // Remove link underline
+                        gameItem.style.color = 'inherit'; // Inherit text color
 
                         const logoContainer = document.createElement('div');
                         logoContainer.classList.add('game-logo-container');
