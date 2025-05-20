@@ -1,28 +1,29 @@
 // gamed.js
 
-// Import necessary Firebase services (if not already globally available or imported in a separate file)
-// For Firebase SDK v9+ (modular):
-// import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
-// import { initializeApp } from 'firebase/app';
+Import necessary Firebase services (if not already globally available or imported in a separate file)
+ For Firebase SDK v9+ (modular):
+ import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 
-// Your Firebase configuration (replace with your actual config)
-// const firebaseConfig = {
-//     apiKey: "YOUR_API_KEY",
-//     authDomain: "YOUR_AUTH_DOMAIN",
-//     projectId: "YOUR_PROJECT_ID",
-//     storageBucket: "YOUR_STORAGE_BUCKET",
-//     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-//     appId: "YOUR_APP_ID"
-// };
+Your Firebase configuration (replace with your actual config)
+const firebaseConfig = {
+apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
+    authDomain: "igsfogstudio-df541.firebaseapp.com",
+    databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "igsfogstudio-df541",
+    storageBucket: "igsfogstudio-df541.firebasestorage.app",
+    messagingSenderId: "206722625476",
+    appId: "1:206722625476:web:c222830b5404f87bf57e91",
+    measurementId: "G-1JL82Z0FK0"
 
-// Initialize Firebase (if not already initialized)
-// const app = initializeApp(firebaseConfig);
-// const db = getFirestore(app);
+Initialize Firebase (if not already initialized)
+ const app = initializeApp(firebaseConfig);
+ const db = getFirestore(app);
 
-// Assuming Firebase `db` instance is available globally or imported
-// For simplicity, I'll assume `db` is accessible.
-// If using modular SDK, ensure you `import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';`
-// and then `const db = getFirestore();` after `initializeApp`.
+ Assuming Firebase `db` instance is available globally or imported
+ For simplicity, I'll assume `db` is accessible.
+ If using modular SDK, ensure you `import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';`
+ and then `const db = getFirestore();` after `initializeApp`.
 
 document.addEventListener('DOMContentLoaded', () => {
     const gameId = new URLSearchParams(window.location.search).get('id');
