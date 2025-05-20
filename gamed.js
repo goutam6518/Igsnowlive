@@ -1,172 +1,138 @@
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
+// gamed.js
 
-// Your Firebase configuration (REPLACE WITH YOUR ACTUAL CONFIG)
-const firebaseConfig = {
-  apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
-    authDomain: "igsfogstudio-df541.firebaseapp.com",
-    databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "igsfogstudio-df541",
-    storageBucket: "igsfogstudio-df541.firebasestorage.app",
-    messagingSenderId: "206722625476",
-    appId: "1:206722625476:web:c222830b5404f87bf57e91",
-    measurementId: "G-1JL82Z0FK0"
-};
+// Import necessary Firebase services (if not already globally available or imported in a separate file)
+// For Firebase SDK v9+ (modular):
+// import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+// import { initializeApp } from 'firebase/app';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Your Firebase configuration (replace with your actual config)
+// const firebaseConfig = {
+//     apiKey: "YOUR_API_KEY",
+//     authDomain: "YOUR_AUTH_DOMAIN",
+//     projectId: "YOUR_PROJECT_ID",
+//     storageBucket: "YOUR_STORAGE_BUCKET",
+//     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+//     appId: "YOUR_APP_ID"
+// };
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Get references to all necessary HTML elements
-    const gameLogoElement = document.getElementById('gameLogo');
-    const gameNameElement = document.getElementById('gameName');
-    const uploaderNameElement = document.getElementById('uploaderName');
-    const downloadLinkElement = document.getElementById('downloadLink');
-    const trailerVideoElement = document.getElementById('trailerVideo');
-    const videoPlaceholderElement = document.getElementById('videoPlaceholder');
-    const errorMessageElement = document.getElementById('errorMessage');
-    const loadingMessageElement = document.getElementById('loadingMessage');
+// Initialize Firebase (if not already initialized)
+// const app = initializeApp(firebaseConfig);
+// const db = getFirestore(app);
 
-    // Initially hide elements that depend on fetched data
-    gameLogoElement.src = 'placeholder-game.png'; // Set a default placeholder
-    gameLogoElement.alt = 'Loading Game Logo';
-    gameNameElement.textContent = 'Loading Game Details...';
-    uploaderNameElement.textContent = ''; // Clear initial
-    downloadLinkElement.style.display = 'none';
-    videoPlaceholderElement.style.display = 'none';
-    errorMessageElement.style.display = 'none';
-    loadingMessageElement.style.display = 'block'; // Ensure loading message is visible
+// Assuming Firebase `db` instance is available globally or imported
+// For simplicity, I'll assume `db` is accessible.
+// If using modular SDK, ensure you `import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';`
+// and then `const db = getFirestore();` after `initializeApp`.
 
-    // Function to extract game ID from URL query parameters
-    function getGameIdFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        console.log('Extracted Game ID from URL:', id); // Debugging
-        return id;
-    }
-
-    const gameId = getGameIdFromUrl();
+document.addEventListener('DOMContentLoaded', () => {
+    const gameId = new URLSearchParams(window.location.search).get('id');
 
     if (gameId) {
-        try {
-            const gameDocRef = doc(db, 'games', gameId);
-            console.log('Attempting to fetch document for ID:', gameId); // Debugging
-            const gameDocSnap = await getDoc(gameDocRef);
-
-            if (gameDocSnap.exists()) {
-                const gameData = gameDocSnap.data();
-                console.log('Game Data fetched:', gameData); // Debugging
-
-                // Update Game Logo
-                if (gameData.gameLogoUrl) {
-                    gameLogoElement.src = gameData.gameLogoUrl;
-                    gameLogoElement.alt = (gameData.gameName || 'Game') + " Logo";
-                } else {
-                    gameLogoElement.src = 'placeholder-game.png'; // Fallback
-                    gameLogoElement.alt = 'Game Logo (URL missing)';
-                    console.warn('Game logo URL is missing for game ID:', gameId);
-                }
-
-                // Update Game Name
-                gameNameElement.textContent = gameData.gameName || 'Untitled Game';
-
-                // Update Uploader Name
-                // Assuming 'uploaderName' is directly in the 'games' document now for simplicity
-                // If you still want to fetch from 'users' collection, keep the old logic:
-                // const userDocRef = doc(db, 'users', gameData.uploaderId);
-                // const userDocSnap = await getDoc(userDocRef);
-                // if (userDocSnap.exists() && userDocSnap.data().userName) {
-                //     uploaderNameElement.textContent = userDocSnap.data().userName;
-                // } else {
-                //     uploaderNameElement.textContent = 'Unknown User';
-                //     console.warn('Uploader user data or userName missing for uploaderId:', gameData.uploaderId);
-                // }
-                uploaderNameElement.textContent = gameData.uploaderName || 'Unknown Uploader'; // Using direct field
-
-
-                // Update Download Link
-                if (gameData.downloadUrl) {
-                    downloadLinkElement.href = gameData.downloadUrl;
-                    downloadLinkElement.target = '_blank'; // Open in a new tab
-                    downloadLinkElement.download = (gameData.gameName || 'game').toLowerCase().replace(/ /g, '_') + '.zip'; // Suggest a filename
-                    downloadLinkElement.style.display = 'inline-block'; // Show the button
-                } else {
-                    downloadLinkElement.style.display = 'none'; // Hide if no download URL
-                    console.warn('Download URL is missing for game ID:', gameId);
-                }
-
-                // Update Trailer Video
-                if (gameData.trailerVideoLink) {
-                    const videoId = getYoutubeVideoId(gameData.trailerVideoLink);
-                    if (videoId) {
-                        trailerVideoElement.src = `https://www.youtube.com/embed/${videoId}?rel=0`; // Use secure HTTPS
-                        trailerVideoElement.title = `YouTube video player for ${gameData.gameName || 'Game'} Trailer`; // Add a title for accessibility
-                        trailerVideoElement.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; // Ensure permissions
-                        videoPlaceholderElement.style.display = 'block'; // Show video container
-                    } else {
-                        videoPlaceholderElement.style.display = 'none';
-                        console.warn('Could not extract YouTube video ID from link:', gameData.trailerVideoLink);
-                    }
-                } else {
-                    videoPlaceholderElement.style.display = 'none'; // Hide if no trailer link
-                    console.warn('Trailer video link is missing for game ID:', gameId);
-                }
-
-                // Hide loading message and any error messages
-                loadingMessageElement.style.display = 'none';
-                errorMessageElement.style.display = 'none';
-
-            } else {
-                // Game document does not exist
-                console.log('No such game document found in Firestore for ID:', gameId); // Debugging
-                loadingMessageElement.style.display = 'none';
-                errorMessageElement.textContent = 'Game not found! Please check the game ID.';
-                errorMessageElement.style.display = 'block';
-                gameNameElement.textContent = 'Game Not Found';
-                // Hide specific game elements
-                gameLogoElement.src = 'placeholder-game.png';
-                gameLogoElement.alt = 'Game Not Found';
-                uploaderNameElement.textContent = '';
-                downloadLinkElement.style.display = 'none';
-                videoPlaceholderElement.style.display = 'none';
-            }
-        } catch (error) {
-            // Error during Firebase fetch operation
-            console.error('Error fetching game data:', error); // Log the full error object
-            loadingMessageElement.style.display = 'none';
-            errorMessageElement.textContent = `Failed to load game details. Error: ${error.message || 'Unknown error'}. Check console for more info.`;
-            errorMessageElement.style.display = 'block';
-            gameNameElement.textContent = 'Error Loading Game';
-            // Hide specific game elements
-            gameLogoElement.src = 'placeholder-game.png';
-            gameLogoElement.alt = 'Error Loading';
-            uploaderNameElement.textContent = '';
-            downloadLinkElement.style.display = 'none';
-            videoPlaceholderElement.style.display = 'none';
-        }
+        fetchGameDetails(gameId);
     } else {
-        // No game ID provided in the URL
-        console.warn('No game ID specified in the URL. Please provide an ID like: game.html?id=YOUR_GAME_ID'); // Debugging
-        loadingMessageElement.style.display = 'none';
-        errorMessageElement.textContent = 'No game selected. Please return to the home page and select a game.';
-        errorMessageElement.style.display = 'block';
-        gameNameElement.textContent = 'No Game Selected';
-        // Hide specific game elements
-        gameLogoElement.src = 'placeholder-game.png';
-        gameLogoElement.alt = 'No Game Selected';
-        uploaderNameElement.textContent = '';
-        downloadLinkElement.style.display = 'none';
-        videoPlaceholderElement.style.display = 'none';
+        console.error("No game ID found in URL.");
+        // Optionally, redirect to an error page or home
+        // window.location.href = 'index.html';
+    }
+
+    const downloadButton = document.getElementById('downloadButton');
+    if (downloadButton) {
+        downloadButton.addEventListener('click', handleDownload);
     }
 });
 
-// Helper function to extract YouTube video ID
-function getYoutubeVideoId(url) {
-    if (!url) return null; // Handle null or empty URL gracefully
-    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    const videoId = (match && match[2].length === 11) ? match[2] : null;
-    console.log(`Attempted to get YouTube ID from "${url}":`, videoId); // Debugging
-    return videoId;
+async function fetchGameDetails(gameId) {
+    try {
+        // Reference to your Firestore document
+        // Assuming your Firestore collection is named 'games'
+        const gameRef = firebase.firestore().collection('games').doc(gameId); // For Firebase SDK v8 compatibility
+        // For Firebase SDK v9 modular: const gameRef = doc(db, 'games', gameId);
+
+        const docSnap = await gameRef.get(); // For v8
+        // For v9 modular: const docSnap = await getDoc(gameRef);
+
+        if (docSnap.exists) {
+            const gameData = docSnap.data();
+            updatePageContent(gameData);
+        } else {
+            console.warn("No such document!");
+            // Handle case where game is not found
+            document.getElementById('gamePageTitle').textContent = 'Game Not Found';
+            document.getElementById('gameName').textContent = 'Game Not Found';
+            document.getElementById('gameLogo').src = 'placeholder-error.png'; // Provide an error image
+            document.getElementById('uploaderName').textContent = 'N/A';
+            document.getElementById('gameSize').textContent = 'N/A';
+            document.getElementById('downloadCount').textContent = '0';
+            document.getElementById('gameplayVideo').src = ''; // Clear video
+            document.getElementById('downloadButton').disabled = true;
+        }
+    } catch (error) {
+        console.error("Error fetching game details:", error);
+        // Display an error message to the user
+    }
+}
+
+function updatePageContent(gameData) {
+    document.getElementById('gamePageTitle').textContent = gameData.gameName + ' - Download';
+    document.getElementById('gameLogo').src = gameData.gameLogoUrl;
+    document.getElementById('gameLogo').alt = gameData.gameName + ' Logo';
+    document.getElementById('gameName').textContent = gameData.gameName;
+    document.getElementById('uploaderName').textContent = gameData.uploaderName;
+    document.getElementById('gameSize').textContent = gameData.gameSize;
+    document.getElementById('downloadCount').textContent = gameData.downloadCount || 0; // Default to 0 if not set
+
+    // Set YouTube video URL
+    if (gameData.youtubeVideoId) {
+        document.getElementById('gameplayVideo').src = `https://www.youtube.com/embed/${gameData.youtubeVideoId}`;
+    } else {
+        document.getElementById('gameplayVideo').src = ''; // Clear if no video ID
+    }
+
+    // Set download link
+    const downloadButton = document.getElementById('downloadButton');
+    downloadButton.dataset.downloadUrl = gameData.downloadLink; // Store the download URL in a data attribute
+    downloadButton.dataset.gameId = new URLSearchParams(window.location.search).get('id'); // Store game ID
+}
+
+async function handleDownload() {
+    const downloadButton = document.getElementById('downloadButton');
+    const downloadUrl = downloadButton.dataset.downloadUrl;
+    const gameId = downloadButton.dataset.gameId;
+
+    if (!downloadUrl || !gameId) {
+        console.error("Download URL or Game ID missing.");
+        return;
+    }
+
+    try {
+        // Increment download count in Firestore
+        const gameRef = firebase.firestore().collection('games').doc(gameId); // For Firebase SDK v8 compatibility
+        // For Firebase SDK v9 modular: const gameRef = doc(db, 'games', gameId);
+
+        // Fetch current count to increment (or use Firestore's increment field value)
+        const docSnap = await gameRef.get(); // For v8
+        // For v9 modular: const docSnap = await getDoc(gameRef);
+
+        if (docSnap.exists) {
+            const currentCount = docSnap.data().downloadCount || 0;
+            // For Firebase SDK v8:
+            await gameRef.update({
+                downloadCount: currentCount + 1
+            });
+            // For Firebase SDK v9 modular (using FieldValue.increment):
+            // import { increment } from 'firebase/firestore'; // at the top
+            // await updateDoc(gameRef, {
+            //     downloadCount: increment(1)
+            // });
+
+            document.getElementById('downloadCount').textContent = currentCount + 1;
+        }
+
+        // Trigger the download
+        window.open(downloadUrl, '_blank'); // Opens the download link in a new tab/window
+
+    } catch (error) {
+        console.error("Error handling download:", error);
+        alert("There was an error initiating the download. Please try again.");
+    }
 }
