@@ -2,8 +2,8 @@
 
 Import necessary Firebase services (if not already globally available or imported in a separate file)
  For Firebase SDK v9+ (modular):
- import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+ import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
 
 Your Firebase configuration (replace with your actual config)
 const firebaseConfig = {
