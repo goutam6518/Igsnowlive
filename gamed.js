@@ -1,4 +1,4 @@
-// gamed.js
+ gamed.js
 
 Import necessary Firebase services (if not already globally available or imported in a separate file)
  For Firebase SDK v9+ (modular):
