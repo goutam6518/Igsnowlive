@@ -1,50 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="gamePageTitle">Game Details</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Download</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    img.logo {
+      width: 150px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    .download-button {
+      padding: 15px 30px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    .info {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #f1f1f1;
+      padding: 10px 0;
+      border-top: 1px solid #ccc;
+    }
+    .bottom-nav button {
+      font-size: 16px;
+      padding: 10px;
+      width: 100%;
+      background: none;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <header class="game-header">
-        <img id="gameLogo" src="" alt="Game Logo" class="game-logo">
-        <h1 id="gameName" class="game-name"></h1>
-        <p class="uploader-info">Uploaded by: <span id="uploaderName"></span></p>
-    </header>
+  <img id="gameLogo" class="logo" src="" alt="Game Logo"/>
+  <h1 id="gameName">Loading...</h1>
+  <h3 id="uploaderName">Uploader: </h3>
 
-    <main class="game-details-container">
-        <section class="download-section">
-            <p class="game-size">Size: <span id="gameSize"></span></p>
-            <button id="downloadButton" class="download-btn">
-                <i class="fas fa-download"></i> Download Game
-            </button>
-            <p class="download-stats"><span id="downloadCount">0</span> people have downloaded this game</p>
-        </section>
+  <button class="download-button" id="downloadBtn">Download</button>
 
-        <section class="video-section">
-            <h2 class="section-title">Gameplay Video</h2>
-            <div class="video-wrapper">
-                <iframe id="gameplayVideo"
-                        width="560"
-                        height="315"
-                        src=""
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                </iframe>
-            </div>
-        </section>
-    </main>
+  <div class="info" id="downloadCount"></div>
+  <div class="info" id="fileSize"></div>
 
-    <footer class="navigation-footer">
-        <nav>
-            <a href="index.html" class="nav-btn"><i class="fas fa-home"></i> Home</a>
-            <a href="profile.html" class="nav-btn"><i class="fas fa-user"></i> Profile</a>
-        </nav>
-    </footer>
+  <div class="bottom-nav">
+    <button onclick="location.href='index.html'">Home</button>
+    <button onclick="location.href='profile.html'">Profile</button>
+  </div>
 
-    <script src="gamed.js"></script>
-    </body>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
+    authDomain: "igsfogstudio-df541.firebaseapp.com",
+    databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "igsfogstudio-df541",
+    storageBucket: "igsfogstudio-df541.firebasestorage.app",
+    messagingSenderId: "206722625476",
+    appId: "1:206722625476:web:c222830b5404f87bf57e91",
+    measurementId: "G-1JL82Z0FK0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameId = urlParams.get('gameId');
+
+    if (gameId) {
+      db.collection('games').doc(gameId).get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('gameLogo').src = data.logoUrl || 'default-logo.png';
+          document.getElementById('gameName').textContent = data.name || 'Game Name';
+          document.getElementById('uploaderName').textContent = `Uploader: ${data.uploader || 'Unknown'}`;
+          document.getElementById('downloadCount').textContent = `Downloads: ${data.downloadCount || 0}`;
+          document.getElementById('fileSize').textContent = `File Size: ${data.fileSize || 'Unknown'}`;
+
+          document.getElementById('downloadBtn').onclick = () => {
+            window.location.href = data.downloadUrl;
+          };
+        } else {
+          document.getElementById('gameName').textContent = 'Game not found';
+        }
+      }).catch(error => {
+        console.error("Error fetching game:", error);
+        document.getElementById('gameName').textContent = 'Error loading game';
+      });
+    } else {
+      document.getElementById('gameName').textContent = 'No game selected';
+    }
+  </script>
+</body>
 </html>
