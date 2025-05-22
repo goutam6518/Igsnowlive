@@ -3,152 +3,93 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IGS - Profile</title>
+  <title>User Profile</title>
   <style>
     body {
-      font-family: sans-serif;
       margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
     }
-
     header {
-      background-color: #333;
+      background-color: #1f2937;
       color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 2em;
-      position: relative;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-
-    #signOutBtn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: red;
-      color: white;
-      padding: 8px 16px;
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .sign-out {
+      background-color: #ef4444;
       border: none;
+      padding: 0.5rem 1rem;
+      color: white;
       border-radius: 5px;
       cursor: pointer;
     }
-
     .container {
-      max-width: 800px;
-      margin: 20px auto;
-      background-color: white;
-      padding: 20px;
+      max-width: 600px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    .profile-field {
-      margin: 15px 0;
-    }
-
-    .profile-field label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .profile-field input {
-      width: 100%;
-      padding: 8px;
-      font-size: 1em;
-    }
-
-    .profile-logo {
-      width: 120px;
-      height: 120px;
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
       object-fit: cover;
-      border-radius: 8px;
-      display: block;
-      margin: 10px 0;
+      margin-bottom: 1rem;
     }
-
-    #editBtn, #saveBtn {
-      padding: 10px 20px;
-      margin-top: 10px;
-      font-size: 1em;
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #3b82f6;
+      color: white;
+      padding: 0.6rem 1.2rem;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-right: 1rem;
     }
-
-    #editBtn {
-      background-color: #007bff;
-      color: white;
-    }
-
-    #saveBtn {
-      background-color: #28a745;
-      color: white;
-      display: none;
-    }
-
-    h3 {
-      margin-top: 40px;
-    }
-
-    .game-item {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      background-color: #fafafa;
-    }
-
-    .game-item img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-right: 15px;
-    }
-
-    .game-info {
-      flex-grow: 1;
+    button:hover {
+      background-color: #2563eb;
     }
   </style>
 </head>
 <body>
   <header>
-    IGS - Profile
-    <button id="signOutBtn">Sign Out</button>
+    <h1>IGS Profile</h1>
+    <button class="sign-out" id="signOutBtn">Sign Out</button>
   </header>
-
   <div class="container">
-    <div class="profile-field">
-      <label for="username">Username</label>
-      <input type="text" id="username" disabled />
+    <img id="profileLogo" class="profile-pic" src="placeholder.png" alt="Profile Logo">
+    <input type="file" id="logoInput" style="display:none;" />
+    <label for="logoInput"><button id="uploadLogoBtn">Change Logo</button></label>
+    <input type="text" id="userNameInput" disabled />
+    <input type="text" id="studioNameInput" disabled />
+    <div>
+      <button id="editBtn">Edit Profile</button>
+      <button id="saveBtn" style="display:none;">Save Profile</button>
     </div>
-
-    <div class="profile-field">
-      <label for="studioName">Studio Name</label>
-      <input type="text" id="studioName" disabled />
-    </div>
-
-    <div class="profile-field">
-      <label for="logo">Profile Logo</label>
-      <input type="file" id="logoInput" style="display:none" />
-      <img src="placeholder.png" id="logoPreview" class="profile-logo" />
-      <button onclick="document.getElementById('logoInput').click()">Change Logo</button>
-    </div>
-
-    <button id="editBtn">Edit Profile</button>
-    <button id="saveBtn">Save Profile</button>
-
-    <h3>Your Uploaded Games</h3>
-    <div id="gameList"></div>
   </div>
 
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-    import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js';
+    import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-storage.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
@@ -163,92 +104,79 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    const username = document.getElementById('username');
-    const studioName = document.getElementById('studioName');
+    const userNameInput = document.getElementById('userNameInput');
+    const studioNameInput = document.getElementById('studioNameInput');
+    const profileLogo = document.getElementById('profileLogo');
+    const logoInput = document.getElementById('logoInput');
     const editBtn = document.getElementById('editBtn');
     const saveBtn = document.getElementById('saveBtn');
-    const logoInput = document.getElementById('logoInput');
-    const logoPreview = document.getElementById('logoPreview');
-    const gameList = document.getElementById('gameList');
 
-    let currentUserUid;
+    let currentUser;
+    let logoFile;
 
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async user => {
       if (user) {
-        currentUserUid = user.uid;
-        const docRef = doc(db, "users", user.uid);
+        currentUser = user;
+        const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          username.value = data.username || '';
-          studioName.value = data.studioName || '';
-          if (data.logoUrl) logoPreview.src = data.logoUrl;
+          userNameInput.value = data.username || '';
+          studioNameInput.value = data.studioname || '';
+          profileLogo.src = data.logoUrl || 'placeholder.png';
         }
-
-        loadUserGames();
       } else {
-        window.location.href ='auth.html';
+        window.location.href = "auth.html";
       }
     });
 
-    function enableEditing(enable) {
-      username.disabled = !enable;
-      studioName.disabled = !enable;
-      saveBtn.style.display = enable ? 'inline-block' : 'none';
-      editBtn.style.display = enable ? 'none' : 'inline-block';
-    }
+    logoInput.addEventListener('change', () => {
+      logoFile = logoInput.files[0];
+      if (logoFile) {
+        const reader = new FileReader();
+        reader.onload = e => profileLogo.src = e.target.result;
+        reader.readAsDataURL(logoFile);
+      }
+    });
 
-    editBtn.addEventListener('click', () => enableEditing(true));
+    editBtn.addEventListener('click', () => {
+      userNameInput.disabled = false;
+      studioNameInput.disabled = false;
+      saveBtn.style.display = 'inline-block';
+      editBtn.style.display = 'none';
+    });
 
     saveBtn.addEventListener('click', async () => {
-      const docRef = doc(db, "users", currentUserUid);
-      await updateDoc(docRef, {
-        username: username.value,
-        studioName: studioName.value
-      });
-      enableEditing(false);
-    });
+      if (!currentUser) return;
 
-    logoInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async function(evt) {
-          logoPreview.src = evt.target.result;
-          const docRef = doc(db, "users", currentUserUid);
-          await updateDoc(docRef, {
-            logoUrl: evt.target.result
-          });
-        };
-        reader.readAsDataURL(file);
+      const userRef = doc(db, 'users', currentUser.uid);
+      let updates = {
+        username: userNameInput.value.trim(),
+        studioname: studioNameInput.value.trim()
+      };
+
+      if (logoFile) {
+        const storageRef = ref(storage, `logos/${currentUser.uid}`);
+        await uploadBytes(storageRef, logoFile);
+        const url = await getDownloadURL(storageRef);
+        updates.logoUrl = url;
+        profileLogo.src = url;
       }
+
+      await updateDoc(userRef, updates);
+      userNameInput.disabled = true;
+      studioNameInput.disabled = true;
+      saveBtn.style.display = 'none';
+      editBtn.style.display = 'inline-block';
+      alert('Profile updated!');
     });
-
-    async function loadUserGames() {
-      const gamesRef = collection(db, "games");
-      const snapshot = await getDocs(gamesRef);
-      gameList.innerHTML = '';
-
-      snapshot.forEach(doc => {
-        const game = doc.data();
-        if (game.uploaderUid === currentUserUid) {
-          const item = document.createElement('div');
-          item.className = 'game-item';
-          item.innerHTML = `
-            <img src="${game.gameLogoUrl || 'placeholder.png'}" alt="logo" />
-            <div class="game-info">
-              <strong>${game.gameName}</strong><br />
-              <small>${game.fileSize || ''}</small>
-            </div>
-          `;
-          gameList.appendChild(item);
-        }
-      });
-    }
 
     document.getElementById('signOutBtn').addEventListener('click', () => {
-      signOut(auth).then(() => window.location.href = 'auth.html');
+      signOut(auth).then(() => {
+        window.location.href = 'auth.html';
+      });
     });
   </script>
 </body>
