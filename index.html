@@ -173,19 +173,19 @@
             const logoContainer = document.createElement('div');
             logoContainer.classList.add('game-logo-container');
             const logoImg = document.createElement('img');
-            logoImg.src = game.logoUrl || 'placeholder-game.png';
-            logoImg.alt = game.name || 'Game Logo';
+            logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
+            logoImg.alt = game.gameName || 'Game Logo';
             logoImg.classList.add('game-logo');
             logoContainer.appendChild(logoImg);
             gameItem.appendChild(logoContainer);
 
-            const name = document.createElement('p');
-            gameName.textContent = game.name || 'Untitled Game';
+            const gameName = document.createElement('p');
+            gameName.textContent = game.gameName || 'Untitled Game';
             gameItem.appendChild(gameName);
 
-            const uploader = document.createElement('p');
-            userName.textContent = `By ${game.uploader || 'Unknown User'}`;
-            gameItem.appendChild(uploader);
+            const userName = document.createElement('p');
+            userName.textContent = `By ${game.uploaderName || 'Unknown User'}`;
+            gameItem.appendChild(userName);
 
             gameListContainer.appendChild(gameItem);
           });
