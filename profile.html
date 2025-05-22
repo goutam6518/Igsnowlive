@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profile - IGS Games</title>
+  <title>IGS - Profile</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 0;
-      background-color: #f9f9f9;
+      padding: 0;
+      background-color: #f4f4f4;
     }
 
     header {
-      background-color: #111;
+      background-color: #333;
       color: white;
       padding: 20px;
       text-align: center;
@@ -22,238 +23,233 @@
 
     #signOutBtn {
       position: absolute;
-      right: 20px;
       top: 20px;
-      background-color: #ff4d4d;
-      border: none;
+      right: 20px;
+      background-color: red;
       color: white;
-      padding: 8px 12px;
+      padding: 8px 16px;
+      border: none;
       border-radius: 5px;
       cursor: pointer;
-      display: none;
     }
 
-    #authButtons {
-      text-align: center;
-      margin: 20px;
-    }
-
-    #authButtons button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 8px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-
-    #profileContainer {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-top: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    #profileContainer img {
+    .profile-field {
+      margin: 15px 0;
+    }
+
+    .profile-field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .profile-field input {
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+    }
+
+    .profile-logo {
       width: 120px;
       height: 120px;
       object-fit: cover;
-      border-radius: 50%;
-      margin-bottom: 10px;
-    }
-
-    .field {
+      border-radius: 8px;
+      display: block;
       margin: 10px 0;
     }
 
-    .field input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-    }
-
     #editBtn, #saveBtn {
-      background-color: #28a745;
-      color: white;
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 1em;
       border: none;
-      padding: 10px 16px;
-      margin-top: 15px;
       border-radius: 5px;
       cursor: pointer;
+    }
+
+    #editBtn {
+      background-color: #007bff;
+      color: white;
     }
 
     #saveBtn {
+      background-color: #28a745;
+      color: white;
       display: none;
     }
 
-    #gameList {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 15px;
-      margin: 30px auto;
-      max-width: 1000px;
-      padding: 0 20px;
+    h3 {
+      margin-top: 40px;
     }
 
-    .gameCard {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: center;
+    .game-item {
+      border: 1px solid #ccc;
       padding: 10px;
-    }
-
-    .gameCard img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .gameCard p {
-      margin: 10px 0 0;
-      font-weight: bold;
-    }
-
-    #homeBtn {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      font-size: 1em;
-      background-color: #007bff;
-      color: white;
-      border: none;
+      margin: 10px 0;
       border-radius: 8px;
-      cursor: pointer;
+      display: flex;
+      align-items: center;
+      background-color: #fafafa;
+    }
+
+    .game-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+
+    .game-info {
+      flex-grow: 1;
     }
   </style>
 </head>
 <body>
-
   <header>
-    My Profile
+    IGS - Profile
     <button id="signOutBtn">Sign Out</button>
   </header>
 
-  <div id="authButtons">
-    <button id="signInToggle">Sign In</button>
-    <div id="loginCreateButtons" style="display: none;">
-      <button onclick="window.location.href='auth.html'">Login</button>
-      <button onclick="window.location.href='auth.html'">Create Account</button>
+  <div class="container">
+    <div class="profile-field">
+      <label for="username">Username</label>
+      <input type="text" id="username" disabled />
     </div>
-  </div>
 
-  <div id="profileContainer">
-    <div style="text-align:center;">
-      <img id="logoPreview" src="placeholder.png" alt="Profile Logo">
-      <input type="file" id="logoInput" accept="image/*" style="display:none;">
+    <div class="profile-field">
+      <label for="studioName">Studio Name</label>
+      <input type="text" id="studioName" disabled />
     </div>
-    <div class="field">
-      <label>Name:</label>
-      <input type="text" id="username" disabled>
+
+    <div class="profile-field">
+      <label for="logo">Profile Logo</label>
+      <input type="file" id="logoInput" style="display:none" />
+      <img src="placeholder.png" id="logoPreview" class="profile-logo" />
+      <button onclick="document.getElementById('logoInput').click()">Change Logo</button>
     </div>
-    <div class="field">
-      <label>Studio Name:</label>
-      <input type="text" id="studio" disabled>
-    </div>
+
     <button id="editBtn">Edit Profile</button>
     <button id="saveBtn">Save Profile</button>
+
+    <h3>Your Uploaded Games</h3>
+    <div id="gameList"></div>
   </div>
 
-  <h2 style="text-align:center;margin-top:40px;">Uploaded Games</h2>
-  <div id="gameList"></div>
-
-  <button id="homeBtn" onclick="window.location.href='index.html'">Home</button>
-
   <script type="module">
-    // Simulate Firebase Game Fetching
-    const gameList = document.getElementById("gameList");
-    const sampleGames = [
-      { gameName: "Galaxy Rush", gameLogoUrl: "https://via.placeholder.com/150x120" },
-      { gameName: "Dragon Blade", gameLogoUrl: "https://via.placeholder.com/150x120" }
-    ];
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js';
+    import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
 
-    sampleGames.forEach(game => {
-      const div = document.createElement("div");
-      div.className = "gameCard";
-      div.innerHTML = \`
-        <img src="\${game.gameLogoUrl}" alt="">
-        <p>\${game.gameName}</p>
-      \`;
-      gameList.appendChild(div);
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
+      authDomain: "igsfogstudio-df541.firebaseapp.com",
+      projectId: "igsfogstudio-df541",
+      storageBucket: "igsfogstudio-df541.appspot.com",
+      messagingSenderId: "206722625476",
+      appId: "1:206722625476:web:c222830b5404f87bf57e91",
+      measurementId: "G-1JL82Z0FK0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const username = document.getElementById('username');
+    const studioName = document.getElementById('studioName');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const logoInput = document.getElementById('logoInput');
+    const logoPreview = document.getElementById('logoPreview');
+    const gameList = document.getElementById('gameList');
+
+    let currentUserUid;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUserUid = user.uid;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          username.value = data.username || '';
+          studioName.value = data.studioName || '';
+          if (data.logoUrl) logoPreview.src = data.logoUrl;
+        }
+
+        loadUserGames();
+      } else {
+        window.location.href = 'login.html';
+      }
     });
 
-    // Profile Editing
-    const editBtn = document.getElementById("editBtn");
-    const saveBtn = document.getElementById("saveBtn");
-    const username = document.getElementById("username");
-    const studio = document.getElementById("studio");
-    const logoInput = document.getElementById("logoInput");
-    const logoPreview = document.getElementById("logoPreview");
+    function enableEditing(enable) {
+      username.disabled = !enable;
+      studioName.disabled = !enable;
+      saveBtn.style.display = enable ? 'inline-block' : 'none';
+      editBtn.style.display = enable ? 'none' : 'inline-block';
+    }
 
-    editBtn.onclick = () => {
-      username.disabled = false;
-      studio.disabled = false;
-      logoInput.style.display = "block";
-      saveBtn.style.display = "inline-block";
-      editBtn.style.display = "none";
-    };
+    editBtn.addEventListener('click', () => enableEditing(true));
 
-    saveBtn.onclick = () => {
-      username.disabled = true;
-      studio.disabled = true;
-      logoInput.style.display = "none";
-      saveBtn.style.display = "none";
-      editBtn.style.display = "inline-block";
-    };
+    saveBtn.addEventListener('click', async () => {
+      const docRef = doc(db, "users", currentUserUid);
+      await updateDoc(docRef, {
+        username: username.value,
+        studioName: studioName.value
+      });
+      enableEditing(false);
+    });
 
-    logoInput.onchange = (e) => {
+    logoInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          logoPreview.src = e.target.result;
+        reader.onload = async function(evt) {
+          logoPreview.src = evt.target.result;
+          const docRef = doc(db, "users", currentUserUid);
+          await updateDoc(docRef, {
+            logoUrl: evt.target.result
+          });
         };
         reader.readAsDataURL(file);
       }
-    };
-
-    // Simulated Auth UI Toggle
-    const signInToggle = document.getElementById("signInToggle");
-    const loginCreateButtons = document.getElementById("loginCreateButtons");
-    const signOutBtn = document.getElementById("signOutBtn");
-
-    let isSignedIn = false;
-
-    signInToggle.onclick = () => {
-      loginCreateButtons.style.display = 'block';
-    };
-
-    document.querySelectorAll("#loginCreateButtons button").forEach(btn => {
-      btn.onclick = () => {
-        // Simulate Sign Up
-        isSignedIn = true;
-        loginCreateButtons.style.display = 'none';
-        signInToggle.style.display = 'none';
-        signOutBtn.style.display = 'inline-block';
-      };
     });
 
-    signOutBtn.onclick = () => {
-      isSignedIn = false;
-      loginCreateButtons.style.display = 'none';
-      signInToggle.style.display = 'inline-block';
-      signOutBtn.style.display = 'none';
-    };
+    async function loadUserGames() {
+      const gamesRef = collection(db, "games");
+      const snapshot = await getDocs(gamesRef);
+      gameList.innerHTML = '';
+
+      snapshot.forEach(doc => {
+        const game = doc.data();
+        if (game.uploaderUid === currentUserUid) {
+          const item = document.createElement('div');
+          item.className = 'game-item';
+          item.innerHTML = `
+            <img src="${game.gameLogoUrl || 'placeholder.png'}" alt="logo" />
+            <div class="game-info">
+              <strong>${game.gameName}</strong><br />
+              <small>${game.fileSize || ''}</small>
+            </div>
+          `;
+          gameList.appendChild(item);
+        }
+      });
+    }
+
+    document.getElementById('signOutBtn').addEventListener('click', () => {
+      signOut(auth).then(() => window.location.href = 'login.html');
+    });
   </script>
 </body>
 </html>
