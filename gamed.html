@@ -10,15 +10,16 @@
     .info { margin-top: 10px; font-size: 16px; }
     .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; padding: 10px 0; background: #f1f1f1; border-top: 1px solid #ccc; }
     .bottom-nav button { font-size: 16px; background: none; border: none; }
+    #error, #gameSection { display: none; }
   </style>
+
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
-    // TODO: Replace with your Firebase config
     const firebaseConfig = {
-     apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
+      apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
     authDomain: "igsfogstudio-df541.firebaseapp.com",
     databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "igsfogstudio-df541",
@@ -35,24 +36,41 @@
     const gameId = params.get("id");
 
     async function loadGame() {
+      const loader = document.getElementById("loading");
+      const gameSection = document.getElementById("gameSection");
+      const errorDiv = document.getElementById("error");
+
       if (!gameId) {
-        document.body.innerHTML = "<h2>No game selected.</h2>";
+        loader.style.display = "none";
+        errorDiv.textContent = "No game ID provided.";
+        errorDiv.style.display = "block";
         return;
       }
 
-      const docRef = doc(db, "games", gameId);
-      const docSnap = await getDoc(docRef);
+      try {
+        const docRef = doc(db, "games", gameId);
+        const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const game = docSnap.data();
-        document.getElementById("logo").src = game.logoUrl;
-        document.getElementById("name").textContent = game.name;
-        document.getElementById("uploader").textContent = `Uploader: ${game.uploader}`;
-        document.getElementById("downloadBtn").onclick = () => window.location.href = game.downloadUrl;
-        document.getElementById("downloads").textContent = `Downloads: ${game.downloadCount || 0}`;
-        document.getElementById("fileSize").textContent = `File Size: ${game.fileSize || "Unknown"}`;
-      } else {
-        document.body.innerHTML = "<h2>Game not found.</h2>";
+        if (docSnap.exists()) {
+          const game = docSnap.data();
+          document.getElementById("logo").src = game.logoUrl;
+          document.getElementById("name").textContent = game.name;
+          document.getElementById("uploader").textContent = `Uploader: ${game.uploader}`;
+          document.getElementById("downloadBtn").onclick = () => window.location.href = game.downloadUrl;
+          document.getElementById("downloads").textContent = `Downloads: ${game.downloadCount || 0}`;
+          document.getElementById("fileSize").textContent = `File Size: ${game.fileSize || "Unknown"}`;
+
+          loader.style.display = "none";
+          gameSection.style.display = "block";
+        } else {
+          loader.style.display = "none";
+          errorDiv.textContent = "Game not found.";
+          errorDiv.style.display = "block";
+        }
+      } catch (e) {
+        loader.style.display = "none";
+        errorDiv.textContent = "Error loading game: " + e.message;
+        errorDiv.style.display = "block";
       }
     }
 
@@ -61,148 +79,23 @@
 </head>
 <body>
 
-  <img id="logo" src="" alt="Game Logo">
-  <h1 id="name">Loading...</h1>
-  <h3 id="uploader"></h3>
-  <button id="downloadBtn" class="btn">Download</button>
-  <div class="info" id="downloads"></div>
-  <div class="info" id="fileSize"></div>
+  <div id="loading"><h3>Loading game...</h3></div>
+
+  <div id="gameSection">
+    <img id="logo" src="" alt="Game Logo">
+    <h1 id="name"></h1>
+    <h3 id="uploader"></h3>
+    <button id="downloadBtn" class="btn">Download</button>
+    <div class="info" id="downloads"></div>
+    <div class="info" id="fileSize"></div>
+  </div>
+
+  <div id="error" style="color:red; margin-top:20px;"></div>
 
   <div class="bottom-nav">
     <button onclick="location.href='index.html'">Home</button>
     <button onclick="location.href='profile.html'">Profile</button>
   </div>
 
-</body>
-</html>
-         document.getElementById('downloadBtn').onclick = () => {
-            window.location.href = data.downloadUrl;
-          };
-        } else {
-          document.getElementById('gameName').textContent = 'Game not found';
-        }
-      }).catch(error => {
-        console.error("Error fetching game:", error);
-        document.getElementById('gameName').textContent = 'Error loading game';
-      });
-    } else {
-      document.getElementById('gameName').textContent = 'No game selected';
-    }
-  </script>
-</body>
-</html>
-ame Trailer</h2>
-            <div class="video-container">
-                <iframe id="trailerVideo" class="video-iframe" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-
-        <a href="#" class="download-button" id="downloadLink" style="display: none;">Download Game</a>
-        <p id="errorMessage" class="error-message" style="display: none;">Failed to load game details.</p>
-        <p id="loadingMessage" class="loading-indicator">Loading game details...</p>
-    </div>
-
-    <div class="bottom-bar">
-        <a href="index.html" class="bottom-button">Home</a>
-        <a href="profile.html" class="bottom-button">Profile</a>
-    </div>
-
-    <script type="module">
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
-
-        // Your Firebase configuration (replace with your actual config)
-        const firebaseConfig = {
-          apiKey: "YOUR_API_KEY",
-          authDomain: "YOUR_AUTH_DOMAIN",
-          projectId: "YOUR_PROJECT_ID",
-          storageBucket: "YOUR_STORAGE_BUCKET",
-          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-          appId: "YOUR_APP_ID"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const gameLogoElement = document.getElementById('gameLogo');
-            const gameNameElement = document.getElementById('gameName');
-            const uploaderNameElement = document.getElementById('uploaderName');
-            const downloadLinkElement = document.getElementById('downloadLink');
-            const trailerVideoElement = document.getElementById('trailerVideo');
-            const videoPlaceholderElement = document.getElementById('videoPlaceholder');
-            const errorMessageElement = document.getElementById('errorMessage');
-            const loadingMessageElement = document.getElementById('loadingMessage');
-
-            // Function to get the game ID from the URL query parameters
-            function getGameIdFromUrl() {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get('id');
-            }
-
-            const gameId = getGameIdFromUrl();
-
-            if (gameId) {
-                try {
-                    // Use the 'games' collection and the specific document ID
-                    const gameDocRef = doc(db, 'games', gameId);
-                    const gameDocSnap = await getDoc(gameDocRef);
-
-                    if (gameDocSnap.exists()) {
-                        const gameData = gameDocSnap.data();
-
-                        gameLogoElement.src = gameData.gameLogoUrl || 'placeholder-game.png';
-                        gameLogoElement.alt = gameData.gameName + " Logo";
-                        gameNameElement.textContent = gameData.gameName || 'Untitled Game';
-                        uploaderNameElement.textContent = gameData.uploaderName || 'Unknown User';
-
-                        downloadLinkElement.href = gameData.downloadUrl || '#';
-                        downloadLinkElement.target = '_blank';
-                        downloadLinkElement.download = (gameData.gameName || 'game').toLowerCase().replace(/ /g, '_');
-
-                        if (gameData.trailerVideoLink) {
-                            trailerVideoElement.src = `https://www.youtube.com/watch?v=IKSgTTPbRBE4${getYoutubeVideoId(gameData.trailerVideoLink)}`;
-                            videoPlaceholderElement.style.display = 'block';
-                        } else {
-                            videoPlaceholderElement.style.display = 'none';
-                        }
-
-                        // Show content and hide loading/error
-                        downloadLinkElement.style.display = 'inline-block';
-                        loadingMessageElement.style.display = 'none';
-                        errorMessageElement.style.display = 'none';
-
-                    } else {
-                        console.log('No such game!');
-                        loadingMessageElement.style.display = 'none';
-                        errorMessageElement.textContent = 'Game not found!';
-                        errorMessageElement.style.display = 'block';
-                        gameNameElement.textContent = 'Game Not Found';
-                        videoPlaceholderElement.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Error fetching game data:', error);
-                    loadingMessageElement.style.display = 'none';
-                    errorMessageElement.style.display = 'block';
-                    gameNameElement.textContent = 'Error Loading Game';
-                    videoPlaceholderElement.style.display = 'none';
-                }
-            } else {
-                console.log('No game ID specified in the URL.');
-                loadingMessageElement.style.display = 'none';
-                errorMessageElement.textContent = 'No game selected.';
-                errorMessageElement.style.display = 'block';
-                gameNameElement.textContent = 'No Game Selected';
-                videoPlaceholderElement.style.display = 'none';
-            }
-        });
-
-        function getYoutubeVideoId(url) {
-            const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-    </script>
 </body>
 </html>
