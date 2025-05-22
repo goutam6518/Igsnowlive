@@ -53,11 +53,11 @@
 
         if (docSnap.exists()) {
           const game = docSnap.data();
-          document.getElementById("logo").src = game.logoUrl;
-          document.getElementById("name").textContent = game.name;
-          document.getElementById("uploader").textContent = `Uploader: ${game.uploader}`;
-          document.getElementById("downloadBtn").onclick = () => window.location.href = game.downloadUrl;
-          document.getElementById("downloads").textContent = `Downloads: ${game.downloadCount || 0}`;
+          document.getElementById("logo").src = game.gameLogoUrl;
+          document.getElementById("name").textContent = game.gameName;
+          document.getElementById("uploader").textContent = `Uploader: ${game.uploaderName}`;
+          document.getElementById("downloadBtn").onclick = () => window.location.href = game.downloadLink;
+          document.getElementById("downloads").textContent = `Downloads: ${game.downloadsCount || 0}`;
           document.getElementById("fileSize").textContent = `File Size: ${game.fileSize || "Unknown"}`;
 
           loader.style.display = "none";
