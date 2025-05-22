@@ -1,431 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 450px;
-            margin: 20px auto 60px auto; /* Added margin for bottom bar */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile - IGS</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 2em;
+      position: relative;
+    }
 
-        .profile-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    #signOutBtn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        .profile-logo-container {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-bottom: 10px;
-            background-color: #ddd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-            color: #555;
-            cursor: pointer;
-        }
+    #profileSection {
+      background: white;
+      margin: 20px auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
-        .profile-logo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    #profileLogo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: auto;
+      display: block;
+    }
 
-        .edit-logo-button {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px;
-            font-size: 0.7em;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+    #profileForm {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
 
-        .profile-logo-container:hover .edit-logo-button {
-            opacity: 1;
-        }
+    #profileForm input[type="text"],
+    #profileForm input[type="file"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
 
-        .profile-details {
-            text-align: left;
-            margin-bottom: 20px;
-        }
+    #editBtn, #saveBtn {
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
 
-        .profile-details label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-        }
+    #saveBtn {
+      background-color: #28a745;
+      display: none;
+    }
 
-        .profile-details input[type="text"] {
-            width: calc(100% - 12px);
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
+    #gameList {
+      margin: 20px auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 1000px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
 
-        .profile-details p {
-            margin-bottom: 10px;
-            color: #555;
-        }
+    .game-item {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
 
-        .profile-actions button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            margin: 5px;
-        }
+    .game-logo {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
 
-        .profile-actions button:hover {
-            background-color: #0056b3;
-        }
-
-        .logout-button {
-            background-color: #dc3545;
-        }
-
-        .logout-button:hover {
-            background-color: #c82333;
-        }
-
-        #uploadedGamesSection {
-            text-align: left;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
-        #uploadedGamesSection h3 {
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 1.2em;
-        }
-
-        #uploadedGamesList {
-            list-style-type: disc;
-            padding-left: 20px;
-        }
-
-        #uploadedGamesList li {
-            margin-bottom: 5px;
-            font-size: 0.95em;
-        }
-
-        #notLoggedIn {
-            text-align: center;
-            color: red;
-            margin-top: 20px;
-            font-size: 1.1em;
-        }
-
-        #notLoggedIn a {
-            color: blue;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        #profileLogoInput {
-            display: none;
-        }
-
-        #loadingMessage {
-            color: orange;
-            margin-top: 20px;
-            font-size: 1em;
-        }
-
-        #profileContent {
-            display: none; /* Initially hidden */
-        }
-
-        /* Bottom Bar Styles */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #f8f8f8;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: center;
-            padding: 10px 0;
-        }
-
-        .bottom-button {
-            background: none;
-            border: none;
-            color: #555;
-            font-size: 1em;
-            cursor: pointer;
-            padding: 10px 20px;
-            text-decoration: none;
-        }
-
-        .bottom-button:hover {
-            color: #007bff;
-        }
-    </style>
+    .game-name {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>User Profile</h2>
+  <header>
+    User Profile
+    <button id="signOutBtn">Sign Out</button>
+  </header>
 
-        <div id="loadingMessage">Loading profile information...</div>
+  <div id="profileSection">
+    <img id="profileLogo" src="default-profile.png" alt="Profile Logo" />
+    <form id="profileForm">
+      <input type="file" id="logoInput" accept="image/*" disabled />
+      <input type="text" id="userName" value="User Name" disabled />
+      <input type="text" id="studioName" value="Studio Name" disabled />
+      <button type="button" id="editBtn">Edit Profile</button>
+      <button type="button" id="saveBtn">Save Profile</button>
+    </form>
+  </div>
 
-        <div id="notLoggedIn">
-            You are not logged in. Please <a href="auth.html">Log In</a>.
-        </div>
+  <div id="gameList">
+    <!-- Games will appear here -->
+  </div>
 
-        <div id="profileContent">
-            <div class="profile-header">
-                <div class="profile-logo-container" id="profileLogoContainer">
-                    <img id="profileLogo" src="placeholder-logo.png" alt="Profile Logo" class="profile-logo">
-                    <label for="profileLogoInput" class="edit-logo-button">Edit Logo</label>
-                    <input type="file" id="profileLogoInput" accept="image/*">
-                </div>
-            </div>
+  <script type="module">
+    import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
 
-            <div class="profile-details">
-                <label for="userName">User Name:</label>
-                <input type="text" id="userName" placeholder="User Name">
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
+      authDomain: "igsfogstudio-df541.firebaseapp.com",
+      projectId: "igsfogstudio-df541",
+      storageBucket: "igsfogstudio-df541.appspot.com",
+      messagingSenderId: "206722625476",
+      appId: "1:206722625476:web:c222830b5404f87bf57e91",
+      measurementId: "G-1JL82Z0FK0"
+    };
 
-                <label for="studioName">Studio Name:</label>
-                <input type="text" id="studioName" placeholder="Studio Name">
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-                <p><strong>Uploaded Games:</strong> <span id="uploadCount">0</span></p>
-            </div>
+    const userNameInput = document.getElementById('userName');
+    const studioNameInput = document.getElementById('studioName');
+    const logoInput = document.getElementById('logoInput');
+    const profileLogo = document.getElementById('profileLogo');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
 
-            <div class="profile-actions">
-                <button id="saveProfileButton">Save Changes</button>
-                <button id="logoutButton" class="logout-button">Sign Out</button>
-            </div>
+    editBtn.onclick = () => {
+      userNameInput.disabled = false;
+      studioNameInput.disabled = false;
+      logoInput.disabled = false;
+      editBtn.style.display = 'none';
+      saveBtn.style.display = 'inline-block';
+    };
 
-            <div id="uploadedGamesSection">
-                <h3>Your Uploaded Games:</h3>
-                <ul id="uploadedGamesList">
-                    </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="bottom-bar">
-        <a href="index.html" class="bottom-button">Home</a>
-    </div>
-
-    <script type="module">
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js';
-        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-storage.js';
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js';
-
-        // Your Firebase configuration (the same as in your other files)
-        const firebaseConfig = {
-          apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
-    authDomain: "igsfogstudio-df541.firebaseapp.com",
-    databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "igsfogstudio-df541",
-    storageBucket: "igsfogstudio-df541.firebasestorage.app",
-    messagingSenderId: "206722625476",
-    appId: "1:206722625476:web:c222830b5404f87bf57e91",
-    measurementId: "G-1JL82Z0FK0"
+    saveBtn.onclick = () => {
+      userNameInput.disabled = true;
+      studioNameInput.disabled = true;
+      logoInput.disabled = true;
+      editBtn.style.display = 'inline-block';
+      saveBtn.style.display = 'none';
+      const file = logoInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          profileLogo.src = reader.result;
         };
+        reader.readAsDataURL(file);
+      }
+      // Save profile data to Firestore here
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+    async function loadGames() {
+      const gameList = document.getElementById('gameList');
+      const snapshot = await getDocs(collection(db, 'games'));
+      snapshot.forEach(doc => {
+        const game = doc.data();
+        const gameItem = document.createElement('div');
+        gameItem.className = 'game-item';
+        gameItem.innerHTML = `
+          <img class="game-logo" src="${game.gameLogoUrl || 'placeholder.png'}" alt="${game.gameName}" />
+          <div class="game-name">${game.gameName}</div>
+        `;
+        gameList.appendChild(gameItem);
+      });
+    }
 
-        // DOM Elements
-        const profileContent = document.getElementById('profileContent');
-        const notLoggedInDiv = document.getElementById('notLoggedIn');
-        const profileLogoElement = document.getElementById('profileLogo');
-        const profileLogoInput = document.getElementById('profileLogoInput');
-        const userNameInput = document.getElementById('userName');
-        const studioNameInput = document.getElementById('studioName');
-        const uploadCountElement = document.getElementById('uploadCount');
-        const uploadedGamesList = document.getElementById('uploadedGamesList');
-        const logoutButton = document.getElementById('logoutButton');
-        const saveProfileButton = document.getElementById('saveProfileButton');
-        const loadingMessage = document.getElementById('loadingMessage');
-
-        // Function to fetch user profile data
-        async function fetchUserProfile(uid) {
-            try {
-                const userDocRef = doc(db, 'users', uid);
-                const userDocSnap = await getDoc(userDocRef);
-                if (userDocSnap.exists()) {
-                    return userDocSnap.data();
-                } else {
-                    return null;
-                }
-            } catch (error) {
-                console.error('Error fetching user profile:', error);
-                return null;
-            }
-        }
-
-        // Function to fetch uploaded games for the user
-        async function fetchUploadedGames(uid) {
-            try {
-                const gamesCollectionRef = collection(db, 'games');
-                const q = query(gamesCollectionRef, where('uploaderId', '==', uid));
-                const querySnapshot = await getDocs(q);
-                const games = [];
-                querySnapshot.forEach((doc) => {
-                    games.push({ id: doc.id, ...doc.data() });
-                });
-                return games;
-            } catch (error) {
-                console.error('Error fetching uploaded games:', error);
-                return [];
-            }
-        }
-
-        // Function to display uploaded games
-        function displayUploadedGames(games) {
-            uploadedGamesList.innerHTML = '';
-            if (games.length > 0) {
-                games.forEach(game => {
-                    const li = document.createElement('li');
-                    li.textContent = game.name || 'Untitled Game';
-                    uploadedGamesList.appendChild(li);
-                });
-            } else {
-                const li = document.createElement('li');
-                li.textContent = 'No games uploaded yet.';
-                uploadedGamesList.appendChild(li);
-            }
-            uploadCountElement.textContent = games.length;
-        }
-
-        // Function to update UI based on auth state
-        onAuthStateChanged(auth, async (user) => {
-            loadingMessage.style.display = 'none';
-            if (user) {
-                notLoggedInDiv.style.display = 'none';
-                profileContent.style.display = 'block';
-
-                const profileData = await fetchUserProfile(user.uid);
-                if (profileData) {
-                    userNameInput.value = profileData.userName || '';
-                    studioNameInput.value = profileData.studioName || '';
-                    if (profileData.profileLogoUrl) {
-                        profileLogoElement.src = profileData.profileLogoUrl;
-                    } else {
-                        profileLogoElement.src = 'placeholder-logo.png';
-                    }
-                } else {
-                    userNameInput.value = '';
-                    studioNameInput.value = '';
-                    profileLogoElement.src = 'placeholder-logo.png';
-                }
-
-                const uploadedGames = await fetchUploadedGames(user.uid);
-                displayUploadedGames(uploadedGames);
-
-            } else {
-                notLoggedInDiv.style.display = 'block';
-                profileContent.style.display = 'none';
-            }
-        });
-
-        // Event listener for logout
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                // onAuthStateChanged will handle UI update
-            } catch (error) {
-                console.error('Error signing out:', error);
-                alert('Error signing out.');
-            }
-        });
-
-        // Event listener for saving profile changes
-        saveProfileButton.addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (user) {
-                const newUserName = userNameInput.value.trim();
-                const newStudioName = studioNameInput.value.trim();
-
-                try {
-                    const userDocRef = doc(db, 'users', user.uid);
-                    await updateDoc(userDocRef, {
-                        userName: newUserName,
-                        studioName: newStudioName
-                    });
-                    alert('Profile updated successfully!');
-                } catch (error) {
-                    console.error('Error updating profile:', error);
-                    alert('Error updating profile.');
-                }
-            } else {
-                alert('Not logged in.');
-            }
-        });
-
-        // Event listener for profile logo upload
-        profileLogoInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const user = auth.currentUser;
-                if (user) {
-                    const storageRef = ref(storage, `profile-logos/${user.uid}/${file.name}`);
-                    try {
-                        const snapshot = await uploadBytes(storageRef, file);
-                        const downloadURL = await getDownloadURL(snapshot.ref);
-                        const userDocRef = doc(db, 'users', user.uid);
-                        await updateDoc(userDocRef, {
-                            profileLogoUrl: downloadURL
-                        });
-                        profileLogoElement.src = downloadURL;
-                    } catch (error) {
-                        console.error('Error uploading profile logo:', error);
-                        alert('Error uploading profile logo.');
-                    }
-                } else {
-                    alert('Not logged in.');
-                }
-            }
-        });
-    </script>
+    loadGames();
+  </script>
 </body>
 </html>
