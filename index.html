@@ -168,7 +168,7 @@
             const logoContainer = document.createElement('div');
             logoContainer.classList.add('game-logo-container');
             const logoImg = document.createElement('img');
-            logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
+            logoImg.src = game.gameLogoLink|| 'placeholder-game.png';
             logoImg.alt = game.gameName || 'Game Logo';
             logoImg.classList.add('game-logo');
             logoContainer.appendChild(logoImg);
