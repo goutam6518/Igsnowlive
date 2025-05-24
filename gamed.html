@@ -3,14 +3,101 @@
 <head>
   <title>Game Download</title>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    body { font-family: Arial, sans-serif; font-size:40xp; text-align: center; padding: 20px; background-color: #000; color: #ffc107; }
-    img { width: 530px; border-radius: 10px; margin-bottom: 20px; }
-    .btn { background: #ffc107; color: #000; height: 15%; width: 40%; padding: 12px 25px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-    .info { margin-top: 5px; font-size: 40px; }
-    .bottom-nav { position: fixed; bottom: 0; height: 2%; width: 100%; display: flex; justify-content: space-around; padding: 10px 0; background: #ffc107; border-top: 1px solid #ccc; }
-    .bottom-nav button { font-size: 25px; background: none; border: none; }
-    #error, #gameSection { display: none; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      background-color: #000;
+      color: #ffc107;
+    }
+
+    #gameSection {
+      padding: 30px 20px 100px;
+    }
+
+    #logo {
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+      margin-top: 30px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin: 10px 0 5px;
+    }
+
+    h3 {
+      font-size: 1em;
+      margin-bottom: 30px;
+      color: #ffc107;
+    }
+
+    .btn {
+      background: #ffc107;
+      color: #000;
+      width: 80%;
+      max-width: 300px;
+      padding: 15px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .info-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    #loading, #error {
+      padding: 40px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      background-color: #ffc107;
+      padding: 15px 40px;
+      box-sizing: border-box;
+    }
+
+    .bottom-nav button {
+      background: none;
+      border: none;
+      color: #000;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .info-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        width: 90%;
+      }
+
+      .bottom-nav {
+        padding: 10px 20px;
+      }
+    }
   </style>
 
   <!-- Firebase -->
@@ -20,13 +107,13 @@
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
-    authDomain: "igsfogstudio-df541.firebaseapp.com",
-    databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "igsfogstudio-df541",
-    storageBucket: "igsfogstudio-df541.firebasestorage.app",
-    messagingSenderId: "206722625476",
-    appId: "1:206722625476:web:c222830b5404f87bf57e91",
-    measurementId: "G-1JL82Z0FK0"
+      authDomain: "igsfogstudio-df541.firebaseapp.com",
+      databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "igsfogstudio-df541",
+      storageBucket: "igsfogstudio-df541.appspot.com",
+      messagingSenderId: "206722625476",
+      appId: "1:206722625476:web:c222830b5404f87bf57e91",
+      measurementId: "G-1JL82Z0FK0"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -57,8 +144,8 @@
           document.getElementById("name").textContent = game.gameName;
           document.getElementById("uploader").textContent = `Uploader: ${game.uploaderName}`;
           document.getElementById("downloadBtn").onclick = () => window.location.href = game.downloadLink;
-          document.getElementById("downloads").textContent = `Downloads: ${game.downloadsCount || 0}`;
-          document.getElementById("fileSize").textContent = `File Size: ${game.fileSize || "Unknown"}`;
+          document.getElementById("downloads").textContent = `${game.downloadsCount || 0} Downloads`;
+          document.getElementById("fileSize").textContent = `Size ${game.fileSize || "Unknown"}`;
 
           loader.style.display = "none";
           gameSection.style.display = "block";
@@ -85,12 +172,16 @@
     <img id="logo" src="" alt="Game Logo">
     <h1 id="name"></h1>
     <h3 id="uploader"></h3>
+
+    <div class="info-container">
+      <div id="fileSize"></div>
+      <div id="downloads"></div>
+    </div>
+
     <button id="downloadBtn" class="btn">Download</button>
-    <div class="info" id="downloads"></div>
-    <div class="info" id="fileSize"></div>
   </div>
 
-  <div id="error" style="color:red; margin-top:20px;"></div>
+  <div id="error" style="color:red;"></div>
 
   <div class="bottom-nav">
     <button onclick="location.href='index.html'">Home</button>
