@@ -63,7 +63,7 @@
       border: 2px solid #000;
       padding: 10px;
       border-radius: 10px;
-      transition: transform 0.2.5s;
+      transition: transform 0.2s;
     }
     .game-item:hover {
       transform: scale(0.80);
@@ -168,7 +168,7 @@
             const logoContainer = document.createElement('div');
             logoContainer.classList.add('game-logo-container');
             const logoImg = document.createElement('img');
-            logoImg.src = game.gameLogoLink|| 'placeholder-game.png';
+            logoImg.src = game.gameLogoUrl|| 'placeholder-game.png';
             logoImg.alt = game.gameName || 'Game Logo';
             logoImg.classList.add('game-logo');
             logoContainer.appendChild(logoImg);
