@@ -14,7 +14,7 @@
     }
 
     #gameSection {
-      padding: 30px 20px 100px;
+      padding: 30px 20px 150px;
     }
 
     #logo {
@@ -54,6 +54,22 @@
       margin-top: 30px;
       font-size: 1.2em;
       font-weight: bold;
+    }
+
+    .screenshots-container {
+      margin-top: 30px;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 10px;
+    }
+
+    .screenshots-container img {
+      width: 250px;
+      height: 150px;
+      object-fit: cover;
+      margin-right: 15px;
+      border-radius: 10px;
+      display: inline-block;
     }
 
     #loading, #error {
@@ -96,6 +112,11 @@
 
       .bottom-nav {
         padding: 10px 20px;
+      }
+
+      .screenshots-container img {
+        width: 80%;
+        height: auto;
       }
     }
   </style>
@@ -147,6 +168,25 @@
           document.getElementById("downloads").textContent = `${game.downloadsCount || 0} Downloads`;
           document.getElementById("fileSize").textContent = `Size ${game.fileSize || "Unknown"}`;
 
+          // Screenshots
+          const screenshots = [
+            game.screenshot1,
+            game.screenshot2,
+            game.screenshot3,
+            game.screenshot4
+          ];
+
+          const container = document.getElementById("screenshots");
+          container.innerHTML = "";
+
+          screenshots.forEach(url => {
+            if (url) {
+              const img = document.createElement("img");
+              img.src = url;
+              container.appendChild(img);
+            }
+          });
+
           loader.style.display = "none";
           gameSection.style.display = "block";
         } else {
@@ -179,6 +219,8 @@
     </div>
 
     <button id="downloadBtn" class="btn">Download</button>
+
+    <div id="screenshots" class="screenshots-container"></div>
   </div>
 
   <div id="error" style="color:red;"></div>
