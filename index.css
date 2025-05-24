@@ -70,6 +70,7 @@ nav button:hover {
   padding: 20px;
   margin: 10px auto;
   border-radius: 10px;
+  border:1xp solid ##ffc107;
   width: 90%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
