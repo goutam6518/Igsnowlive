@@ -5,17 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>IGS - Home</title>
   <style>
-    body {
-      font-family: sans-serif;
-      color: #000;
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      background-color: #000;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      font-family: sans-serif;
+      background-color: #000;
+      color: #000;
     }
-
     header {
       background-color: #ffc107;
       color: #000;
@@ -23,107 +22,100 @@
       width: 100%;
       text-align: center;
       font-size: 2em;
+      font-weight: bold;
     }
-
     nav {
       background-color: #000;
       padding: 10px;
-      width: 80%;
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
     }
-
     nav button {
       padding: 10px 20px;
       border: none;
       background-color: #ffc107;
       color: #000;
-      cursor: pointer;
-      border-radius: 5px;
       font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
     }
-
     nav button:hover {
       background-color: #e0a800;
     }
-
     .upload-button-container {
-      width: 80%;
-      text-align: right;
+      width: 100%;
+      text-align: center;
       margin: 20px 0;
     }
-
     .upload-button {
-      padding: 10px 20px;
-      border: none;
       background-color: #000;
       color: white;
-      cursor: pointer;
+      border: 2px solid #ffc107;
+      padding: 10px 20px;
       border-radius: 5px;
       font-size: 1em;
+      cursor: pointer;
     }
-
     .upload-button:hover {
       background-color: #ffc107;
       color: #000;
     }
-
     #gameList {
       background-color: #ffc107;
       padding: 20px;
-      margin: 20px;
+      margin: 10px auto;
       border-radius: 10px;
-      width: 80%;
+      width: 90%;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 20px;
-      justify-items: center;
+      flex-grow: 1;
     }
-
     .game-item {
-      text-align: center;
       background-color: #ffc107;
       border: 2px solid #000;
-      padding: 10px;
       border-radius: 10px;
+      text-align: center;
+      color: #000;
       text-decoration: none;
-      color: inherit;
+      transition: transform 0.2s;
+      padding: 10px;
     }
-
+    .game-item:hover {
+      transform: scale(0.95);
+    }
     .game-logo-container {
       width: 100px;
       height: 100px;
+      margin: 0 auto 10px;
+      background-color: #fff;
       border-radius: 8px;
       overflow: hidden;
-      background-color: #eee;
-      margin: auto auto 10px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
-
     .game-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
-
     footer {
-      background-color: #222;
+      background-color: #1c1c1c;
       color: #fff;
-      width: 100%;
-      padding: 20px;
+      padding: 10px 0;
       text-align: center;
       font-size: 0.9em;
+      width: 100%;
     }
-
-    .social-links a {
+    footer a {
       color: #ffc107;
       margin: 0 10px;
       text-decoration: none;
     }
-
-    .social-links a:hover {
+    footer a:hover {
       text-decoration: underline;
     }
   </style>
@@ -144,12 +136,10 @@
   <div id="gameList">Loading games...</div>
 
   <footer>
-    <div>IGS Game Platform &copy; 2025</div>
-    <div class="social-links">
-      <a href="https://instagram.com/" target="_blank">Instagram</a> |
-      <a href="https://facebook.com/" target="_blank">Facebook</a> |
-      <a href="https://twitter.com/" target="_blank">Twitter</a>
-    </div>
+    IGS Game Platform © 2025<br/>
+    <a href="#">Instagram</a> | 
+    <a href="#">Facebook</a> | 
+    <a href="#">Twitter</a>
   </footer>
 
   <script type="module">
@@ -160,10 +150,12 @@
     const firebaseConfig = {
       apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
       authDomain: "igsfogstudio-df541.firebaseapp.com",
+      databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "igsfogstudio-df541",
       storageBucket: "igsfogstudio-df541.appspot.com",
       messagingSenderId: "206722625476",
-      appId: "1:206722625476:web:c222830b5404f87bf57e91"
+      appId: "1:206722625476:web:c222830b5404f87bf57e91",
+      measurementId: "G-1JL82Z0FK0"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -186,22 +178,23 @@
             gameItem.classList.add('game-item');
 
             const logoContainer = document.createElement('div');
-            logoContainer.className = 'game-logo-container';
+            logoContainer.classList.add('game-logo-container');
+
             const logoImg = document.createElement('img');
             logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
             logoImg.alt = game.gameName || 'Game Logo';
-            logoImg.className = 'game-logo';
+            logoImg.classList.add('game-logo');
+
             logoContainer.appendChild(logoImg);
+            gameItem.appendChild(logoContainer);
 
             const gameName = document.createElement('p');
             gameName.textContent = game.gameName || 'Untitled Game';
-
-            const uploader = document.createElement('p');
-            uploader.textContent = `By ${game.uploaderName || 'Unknown'}`;
-
-            gameItem.appendChild(logoContainer);
             gameItem.appendChild(gameName);
-            gameItem.appendChild(uploader);
+
+            const userName = document.createElement('p');
+            userName.textContent = `By ${game.uploaderName || 'Unknown User'}`;
+            gameItem.appendChild(userName);
 
             gameListContainer.appendChild(gameItem);
           });
@@ -209,12 +202,12 @@
           gameListContainer.textContent = 'No games uploaded yet.';
         }
       } catch (error) {
-        console.error('Error loading games:', error);
-        gameListContainer.textContent = 'Error loading games.';
+        console.error('Error fetching games:', error);
+        gameListContainer.textContent = 'Failed to load games.';
       }
     }
 
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async () => {
       await displayAllGames();
     });
   </script>
