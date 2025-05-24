@@ -85,10 +85,10 @@ nav button:hover {
   color: #000;
   text-decoration: none;
   transition: transform 0.2s;
-  padding: 10px;
+  padding: 5px;
 }
 .game-item:hover {
-  transform: scale(0.95);
+  transform: scale(0.80);
 }
 
 /* Game logo styling */
