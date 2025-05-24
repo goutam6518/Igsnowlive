@@ -9,15 +9,15 @@
             font-family: sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #000;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         header {
-            background-color: #333;
-            color: white;
+            background-color: #ffc107;
+            color: #000;
             padding: 20px;
             width: 100%;
             text-align: center;
@@ -25,7 +25,7 @@
         }
 
         nav {
-            background-color: #ddd;
+            background-color: #000;
             padding: 10px;
             width: 100%;
             display: flex;
@@ -35,19 +35,19 @@
         nav button {
             padding: 10px 20px;
             border: none;
-            background-color: #007bff;
-            color: white;
+            background-color: #ffc107;
+            color: #000;
             cursor: pointer;
             border-radius: 5px;
             font-size: 1em;
         }
 
         nav button:hover {
-            background-color: #0056b3;
+            background-color: #ffc107;
         }
 
         #searchBar {
-            background-color: white;
+            background-color: #000 ;
             padding: 15px;
             margin: 20px 0;
             border-radius: 8px;
@@ -59,7 +59,7 @@
 
         #searchInput {
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #ffc107;
             border-radius: 5px 0 0 5px;
             font-size: 1em;
             width: 70%;
@@ -68,19 +68,19 @@
         #searchButton {
             padding: 10px 20px;
             border: none;
-            background-color: #28a745;
-            color: white;
+            background-color: #ffc107;
+            color: #000;
             cursor: pointer;
             border-radius: 0 5px 5px 0;
             font-size: 1em;
         }
 
         #searchButton:hover {
-            background-color: #1e7e34;
+            background-color: #ffc107;
         }
 
         #gameList {
-            background-color: white;
+            background-color: #ffc107;
             padding: 20px;
             margin: 20px;
             border-radius: 8px;
@@ -206,7 +206,7 @@
             const logoContainer = document.createElement('div');
             logoContainer.classList.add('game-logo-container');
             const logoImg = document.createElement('img');
-            logoImg.src = game.logoUrl || 'placeholder-game.png';
+            logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
             logoImg.alt = game.name || 'Game Logo';
             logoImg.classList.add('game-logo');
             logoContainer.appendChild(logoImg);
@@ -214,7 +214,7 @@
 
             const gameName = document.createElement('p');
             gameName.classList.add('game-name');
-            gameName.textContent = game.name || 'Untitled Game';
+            gameName.textContent = game.gameName || 'Untitled Game';
             gameItem.appendChild(gameName);
 
             gameListContainer.appendChild(gameItem);
@@ -227,7 +227,7 @@
 
             if (searchTerm) {
                 const searchResults = allGames.filter(game =>
-                    (game.name || '').toLowerCase().includes(searchTerm)
+                    (game.gameName || '').toLowerCase().includes(searchTerm)
                 );
 
                 if (searchResults.length > 0) {
