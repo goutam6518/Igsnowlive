@@ -3,29 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IGS Home</title>
+  <title>IGS - Home</title>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
-      background-color: #000;
+      background-color: #0d0d0d;
+      font-family: Arial, sans-serif;
       color: #fff;
     }
-
-    #siteHeader {
+    header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background-color: #000;
+      justify-content: space-between;
       padding: 10px 20px;
+      background-color: #000;
       border-bottom: 2px solid #ffc107;
     }
-
-    #siteHeader img {
-      height: 60px;
+    #logo {
+      height: 40px;
     }
-
-    #siteHeader button {
+    .site-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #ffc107;
+      margin-left: 10px;
+    }
+    .profile-btn {
+      background-color: #ffc107;
+      border: none;
+      color: #000;
+      padding: 8px 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .video-section {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    iframe {
+      width: 90%;
+      max-width: 800px;
+      height: 400px;
+      border: none;
+      border-radius: 8px;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    nav button {
       background-color: #ffc107;
       color: #000;
       border: none;
@@ -34,103 +65,106 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
-    #youtubeSection {
-      margin: 20px auto;
-      width: 95%;
-      max-width: 720px;
-    }
-
-    #youtubePlayer {
-      width: 100%;
-      height: 400px;
-      border: none;
-      border-radius: 10px;
-    }
-
-    h2 {
+    .games-section {
+      padding: 0 20px 40px;
       text-align: center;
-      color: #ffc107;
-      margin-top: 40px;
     }
-
+    .games-section h2 {
+      color: white;
+      margin-bottom: 20px;
+    }
     #gameList {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 20px;
-      padding: 20px;
-      max-width: 1100px;
-      margin: auto;
+      justify-content: center;
     }
-
     .game-item {
-      background-color: #1c1c1c;
+      background-color: #1a1a1a;
       border: 2px solid #ffc107;
       border-radius: 10px;
+      padding: 15px;
       text-align: center;
       color: #fff;
       text-decoration: none;
       transition: transform 0.2s;
-      padding: 10px;
     }
-
     .game-item:hover {
-      transform: scale(0.95);
+      transform: scale(0.97);
     }
-
-    .game-logo {
+    .game-logo-container {
       width: 100px;
       height: 100px;
+      margin: 0 auto 10px;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .game-logo {
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      margin-bottom: 10px;
     }
-
     footer {
-      background-color: #111;
+      background-color: #1c1c1c;
+      color: #fff;
+      padding: 15px 0;
       text-align: center;
-      padding: 20px;
-      color: #888;
       font-size: 0.9em;
+      border-top: 2px solid #333;
     }
-
     footer a {
       color: #ffc107;
-      text-decoration: none;
       margin: 0 10px;
+      text-decoration: none;
     }
-
     footer a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div id="siteHeader">
-    <img id="siteLogo" src="" alt="Website Logo" src="https://ik.imagekit.io/6ilngyaqa/1748151255149-1000078269_3cHySnYwl.webp"/>
-    <button onclick="window.location.href='profile.html'">Profile</button>
+
+  <header>
+    <div style="display: flex; align-items: center;">
+      <img id="logo" alt="Logo" src="https://ik.imagekit.io/6ilngyaqa/1748151255149-1000078269_3cHySnYwl.webp" />
+      <span class="site-title">IGS</span>
+    </div>
+    <button class="profile-btn" onclick="window.location.href='profile.html'">Profile</button>
+  </header>
+
+  <div class="video-section">
+    <iframe id="youtubePlayer" allowfullscreen></iframe>
   </div>
 
-  <div id="youtubeSection">
-    <iframe id="youtubePlayer" src="" allowfullscreen></iframe>
-  </div>
+  <nav>
+    <button onclick="location.href='index.html'">Home</button>
+    <button onclick="location.href='games.html'">Games</button>
+    <button onclick="location.href='event.html'">event</button>
+    <button onclick="location.href='chatbot.html'">HBot</button>
+  </nav>
 
-  <h2>New Games</h2>
-  <div id="gameList">Loading games...</div>
+  <div class="games-section">
+    <h2>NEW GAMES</h2>
+    <div id="gameList">Loading games...</div>
+  </div>
 
   <footer>
     IGS Game Platform © 2025<br/>
-    <a href="#">Instagram</a> |
-    <a href="#">Facebook</a> |
+    <a href="#">Instagram</a> | 
+    <a href="#">Facebook</a> | 
     <a href="#">Twitter</a>
   </footer>
 
   <script type="module">
-    import { getFirestore, doc, getDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
+    import { getFirestore, doc, getDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
       authDomain: "igsfogstudio-df541.firebaseapp.com",
+      databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "igsfogstudio-df541",
       storageBucket: "igsfogstudio-df541.appspot.com",
       messagingSenderId: "206722625476",
@@ -140,56 +174,97 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    async function loadIndexData() {
-      const docRef = doc(db, "index", "home");
-      const docSnap = await getDoc(docRef);
+    // Load logo and video from Firestore
+    async function loadSiteInfo() {
+      try {
+        const docRef = doc(db, "index", "index");
+        const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        document.getElementById("siteLogo").src = data.logoUrl || "";
-        document.getElementById("youtubePlayer").src = data.youtubeUrl || "";
-      } else {
-        console.error("No index document found.");
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const logoUrl = data.logoUrl;
+          const videoUrl = data.videoUrl;
+
+          // Set logo
+          const logoImg = document.getElementById("logo");
+          if (logoImg && logoUrl) {
+            logoImg.src = logoUrl;
+          }
+
+          // Set video iframe
+          const youtubePlayer = document.getElementById("youtubePlayer");
+          if (youtubePlayer && videoUrl) {
+            const videoId = extractYouTubeID(videoUrl);
+            if (videoId) {
+              youtubePlayer.src = `https://www.youtube.com/embed/${videoId}`;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading site info:", error);
       }
     }
 
-    async function loadGames() {
+    function extractYouTubeID(url) {
+      const regex = /(?:youtube\.com.*v=|youtu\.be\/)([^&#]+)/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    // Load games
+    async function displayAllGames() {
       const gameListContainer = document.getElementById('gameList');
       gameListContainer.innerHTML = '';
-      const querySnapshot = await getDocs(collection(db, "games"));
 
-      if (!querySnapshot.empty) {
-        querySnapshot.forEach(doc => {
-          const game = doc.data();
+      try {
+        const gamesCollectionRef = collection(db, 'games');
+        const querySnapshot = await getDocs(gamesCollectionRef);
 
-          const gameItem = document.createElement('a');
-          gameItem.href = `gamed.html?id=${doc.id}`;
-          gameItem.className = 'game-item';
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            const game = doc.data();
+            const gameItem = document.createElement('a');
+            gameItem.href = `gamed.html?id=${doc.id}`;
+            gameItem.classList.add('game-item');
 
-          const img = document.createElement('img');
-          img.src = game.gameLogoUrl || 'placeholder.png';
-          img.alt = game.gameName || 'Game';
-          img.className = 'game-logo';
+            const logoContainer = document.createElement('div');
+            logoContainer.classList.add('game-logo-container');
 
-          const name = document.createElement('p');
-          name.textContent = game.gameName || 'Untitled Game';
+            const logoImg = document.createElement('img');
+            logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
+            logoImg.alt = game.gameName || 'Game Logo';
+            logoImg.classList.add('game-logo');
 
-          const uploader = document.createElement('p');
-          uploader.textContent = `By ${game.uploaderName || 'Unknown'}`;
+            logoContainer.appendChild(logoImg);
+            gameItem.appendChild(logoContainer);
 
-          gameItem.appendChild(img);
-          gameItem.appendChild(name);
-          gameItem.appendChild(uploader);
-          gameListContainer.appendChild(gameItem);
-        });
-      } else {
-        gameListContainer.textContent = 'No games available.';
+            const gameName = document.createElement('p');
+            gameName.textContent = game.gameName || 'Untitled Game';
+            gameItem.appendChild(gameName);
+
+            const userName = document.createElement('p');
+            userName.textContent = `By ${game.uploaderName || 'Unknown User'}`;
+            gameItem.appendChild(userName);
+
+            gameListContainer.appendChild(gameItem);
+          });
+        } else {
+          gameListContainer.textContent = 'No games uploaded yet.';
+        }
+      } catch (error) {
+        console.error('Error fetching games:', error);
+        gameListContainer.textContent = 'Failed to load games.';
       }
     }
 
-    loadIndexData();
-    loadGames();
+    // Init
+    onAuthStateChanged(auth, () => {
+      loadSiteInfo();
+      displayAllGames();
+    });
   </script>
+
 </body>
 </html>
