@@ -1,234 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Game Download</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Games</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
-      background-color: #000;
-      color: #ffc107;
+      background-color: #0e0e0e;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
     }
 
-    #gameSection {
-      padding: 30px 20px 150px;
-    }
-
-    #logo {
-      width: 200px;
-      height: 200px;
-      object-fit: contain;
-      margin-top: 30px;
-    }
-
-    h1 {
-      font-size: 2.5em;
-      margin: 10px 0 5px;
-    }
-
-    h3 {
-      font-size: 1em;
-      margin-bottom: 30px;
-      color: #ffc107;
-    }
-
-    .btn {
-      background: #ffc107;
-      color: #000;
-      width: 80%;
-      max-width: 300px;
-      padding: 15px;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-
-    .info-container {
+    header {
       display: flex;
-      justify-content: space-around;
-      margin-top: 30px;
-      font-size: 1.2em;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1a1a1a;
+      padding: 15px 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #ffcc00;
+    }
+
+    .profile-button {
+      background-color: #ffcc00;
+      border: none;
+      padding: 8px 16px;
       font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
     }
 
-    .screenshots-container {
-      margin-top: 30px;
-      overflow-x: auto;
-      white-space: nowrap;
-      padding-bottom: 10px;
+    .search-container {
+      text-align: center;
+      margin: 20px;
     }
 
-    .screenshots-container img {
-      width: 250px;
-      height: 150px;
-      object-fit: cover;
-      margin-right: 15px;
+    .search-container input {
+      width: 70%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    .games-section {
+      padding: 0 20px;
+    }
+
+    .games-section h2 {
+      margin: 20px 0 10px;
+      font-size: 20px;
+      color: #ffffff;
+    }
+
+    .game-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .game-card {
+      background-color: #1a1a1a;
+      border: 2px solid #444;
       border-radius: 10px;
-      display: inline-block;
+      padding: 10px;
+      width: 160px;
+      text-align: center;
     }
 
-    #loading, #error {
-      padding: 40px;
+    .game-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .game-card h3 {
+      margin: 10px 0 4px;
+      font-size: 14px;
+      color: #ffcc00;
+    }
+
+    .game-card p {
+      margin: 0;
+      font-size: 12px;
+      color: #aaa;
     }
 
     .bottom-nav {
       position: fixed;
       bottom: 0;
-      width: 100%;
+      left: 0;
+      right: 0;
+      background-color: #1a1a1a;
+      padding: 10px 0;
       display: flex;
-      justify-content: space-between;
-      background-color: #ffc107;
-      padding: 15px 40px;
-      box-sizing: border-box;
+      justify-content: space-around;
+      border-top: 1px solid #444;
     }
 
     .bottom-nav button {
-      background: none;
+      background-color: #ffcc00;
       border: none;
-      color: #000;
-      font-size: 1.2em;
+      padding: 10px 18px;
       font-weight: bold;
+      border-radius: 6px;
       cursor: pointer;
     }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.8em;
-      }
-
-      .info-container {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .btn {
-        width: 90%;
-      }
-
-      .bottom-nav {
-        padding: 10px 20px;
-      }
-
-      .screenshots-container img {
-        width: 80%;
-        height: auto;
-      }
+    .bottom-nav button:active {
+      background-color: #e6b800;
     }
   </style>
+</head>
+<body>
+  <header>
+    <h1>Games</h1>
+    <button class="profile-button" onclick="location.href='auth.html'">Profile</button>
+  </header>
 
-  <!-- Firebase -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search games by name" onkeyup="searchGames()" />
+  </div>
+
+  <div class="games-section">
+    <h2>All Games</h2>
+    <div id="gameList" class="game-list"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <button onclick="location.href='index.html'">Home</button>
+    <button>Games</button>
+    <button>EVENT</button>
+    <button>H Bot</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js" type="module"></script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCRtPZ34Y1J-p5b7FJxEUagYg3h_D6PbhM",
-      authDomain: "igsfogstudio-df541.firebaseapp.com",
-      databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "igsfogstudio-df541",
-      storageBucket: "igsfogstudio-df541.appspot.com",
-      messagingSenderId: "206722625476",
-      appId: "1:206722625476:web:c222830b5404f87bf57e91",
-      measurementId: "G-1JL82Z0FK0"
+    authDomain: "igsfogstudio-df541.firebaseapp.com",
+    databaseURL: "https://igsfogstudio-df541-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "igsfogstudio-df541",
+    storageBucket: "igsfogstudio-df541.firebasestorage.app",
+    messagingSenderId: "206722625476",
+    appId: "1:206722625476:web:c222830b5404f87bf57e91",
+    measurementId: "G-1JL82Z0FK0"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const params = new URLSearchParams(window.location.search);
-    const gameId = params.get("id");
+    const gameList = document.getElementById("gameList");
 
-    async function loadGame() {
-      const loader = document.getElementById("loading");
-      const gameSection = document.getElementById("gameSection");
-      const errorDiv = document.getElementById("error");
-
-      if (!gameId) {
-        loader.style.display = "none";
-        errorDiv.textContent = "No game ID provided.";
-        errorDiv.style.display = "block";
-        return;
-      }
-
-      try {
-        const docRef = doc(db, "games", gameId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const game = docSnap.data();
-          document.getElementById("logo").src = game.gameLogoUrl;
-          document.getElementById("name").textContent = game.gameName;
-          document.getElementById("uploader").textContent = `Uploader: ${game.uploaderName}`;
-          document.getElementById("downloadBtn").onclick = () => window.location.href = game.downloadLink;
-          document.getElementById("downloads").textContent = `${game.downloadsCount || 0} Downloads`;
-          document.getElementById("fileSize").textContent = `Size ${game.fileSize || "Unknown"}`;
-
-          // Screenshots
-          const screenshots = [
-            game.screenshot1,
-            game.screenshot2,
-            game.screenshot3,
-            game.screenshot4
-          ];
-
-          const container = document.getElementById("screenshots");
-          container.innerHTML = "";
-
-          screenshots.forEach(url => {
-            if (url) {
-              const img = document.createElement("img");
-              img.src = url;
-              container.appendChild(img);
-            }
-          });
-
-          loader.style.display = "none";
-          gameSection.style.display = "block";
-        } else {
-          loader.style.display = "none";
-          errorDiv.textContent = "Game not found.";
-          errorDiv.style.display = "block";
-        }
-      } catch (e) {
-        loader.style.display = "none";
-        errorDiv.textContent = "Error loading game: " + e.message;
-        errorDiv.style.display = "block";
-      }
+    async function loadGames() {
+      const querySnapshot = await getDocs(collection(db, "games"));
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.className = "game-card";
+        card.innerHTML = `
+          <img src="${data.gameLogoUrl}" alt="${data.gameName}" />
+          <h3>${data.gameName}</h3>
+          <p>${data.uploaderName|| "Unknown Studio"}</p>
+        `;
+        gameList.appendChild(card);
+      });
     }
 
-    window.onload = loadGame;
+    window.searchGames = function () {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const cards = document.querySelectorAll(".game-card");
+      cards.forEach(card => {
+        const name = card.querySelector("h3").textContent.toLowerCase();
+        card.style.display = name.includes(input) ? "block" : "none";
+      });
+    };
+
+    loadGames();
   </script>
-</head>
-<body>
-
-  <div id="loading"><h3>Loading game...</h3></div>
-
-  <div id="gameSection">
-    <img id="logo" src="" alt="Game Logo">
-    <h1 id="name"></h1>
-    <h3 id="uploader"></h3>
-
-    <div class="info-container">
-      <div id="fileSize"></div>
-      <div id="downloads"></div>
-    </div>
-
-    <button id="downloadBtn" class="btn">Download</button>
-
-    <div id="screenshots" class="screenshots-container"></div>
-  </div>
-
-  <div id="error" style="color:red;"></div>
-
-  <div class="bottom-nav">
-    <button onclick="location.href='index.html'">Home</button>
-    <button onclick="location.href='profile.html'">Profile</button>
-  </div>
-
 </body>
 </html>
