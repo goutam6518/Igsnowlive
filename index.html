@@ -67,43 +67,49 @@
     }
     .games-section {
       padding: 0 20px 40px;
-      text-align: center;
     }
     .games-section h2 {
       color: white;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      text-align: center;
     }
     #gameList {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
-      justify-content: center;
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding-bottom: 10px;
+      scroll-snap-type: x mandatory;
     }
     .game-item {
+      position: relative;
+      flex: 0 0 auto;
+      width: 250px;
+      height: 140px;
       background-color: #1a1a1a;
-      border: 2px solid #ffc107;
       border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-      color: #fff;
-      text-decoration: none;
-      transition: transform 0.2s;
-    }
-    .game-item:hover {
-      transform: scale(0.97);
-    }
-    .game-logo-container {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 10px;
-      background-color: #fff;
-      border-radius: 8px;
       overflow: hidden;
+      border: 2px solid #ffc107;
+      scroll-snap-align: start;
+      background-size: cover;
+      background-position: center;
+      text-decoration: none;
+      color: white;
     }
-    .game-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+    .game-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1));
+    }
+    .game-info {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      z-index: 1;
+    }
+    .game-info p {
+      margin: 2px 0;
+      font-size: 14px;
     }
     footer {
       background-color: #1c1c1c;
@@ -126,10 +132,7 @@
 <body>
 
   <header>
-    
-    
-      <span class="site-title">IGS</span>
-    </div>
+    <span class="site-title">IGS</span>
     <button class="profile-btn" onclick="window.location.href='profile.html'">Profile</button>
   </header>
 
@@ -176,7 +179,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Load logo and video from Firestore
     async function loadSiteInfo() {
       try {
         const docRef = doc(db, "index", "index");
@@ -187,13 +189,6 @@
           const logoUrl = data.logoUrl;
           const videoUrl = data.videoUrl;
 
-          // Set logo
-          const logoImg = document.getElementById("logo");
-          if (logoImg && logoUrl) {
-            logoImg.src = data.logoUrl;
-          }
-
-          // Set video iframe
           const youtubePlayer = document.getElementById("youtubePlayer");
           if (youtubePlayer && videoUrl) {
             const videoId = extractYouTubeID(videoUrl);
@@ -213,7 +208,6 @@
       return match ? match[1] : null;
     }
 
-    // Load games
     async function displayAllGames() {
       const gameListContainer = document.getElementById('gameList');
       gameListContainer.innerHTML = '';
@@ -228,26 +222,20 @@
             const gameItem = document.createElement('a');
             gameItem.href = `gamed.html?id=${doc.id}`;
             gameItem.classList.add('game-item');
+            gameItem.style.backgroundImage = `url('${game.gameLogoUrl || 'placeholder-game.png'}')`;
 
-            const logoContainer = document.createElement('div');
-            logoContainer.classList.add('game-logo-container');
-
-            const logoImg = document.createElement('img');
-            logoImg.src = game.gameLogoUrl || 'placeholder-game.png';
-            logoImg.alt = game.gameName || 'Game Logo';
-            logoImg.classList.add('game-logo');
-
-            logoContainer.appendChild(logoImg);
-            gameItem.appendChild(logoContainer);
+            const infoContainer = document.createElement('div');
+            infoContainer.classList.add('game-info');
 
             const gameName = document.createElement('p');
             gameName.textContent = game.gameName || 'Untitled Game';
-            gameItem.appendChild(gameName);
+            infoContainer.appendChild(gameName);
 
             const userName = document.createElement('p');
-            userName.textContent = `By ${game.uploaderName || 'Unknown User'}`;
-            gameItem.appendChild(userName);
+            userName.textContent = `By ${game.uploaderName || 'Unknown'}`;
+            infoContainer.appendChild(userName);
 
+            gameItem.appendChild(infoContainer);
             gameListContainer.appendChild(gameItem);
           });
         } else {
@@ -259,7 +247,6 @@
       }
     }
 
-    // Init
     onAuthStateChanged(auth, () => {
       loadSiteInfo();
       displayAllGames();
