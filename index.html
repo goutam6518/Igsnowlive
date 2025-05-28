@@ -19,14 +19,10 @@
       background-color: #000;
       border-bottom: 2px solid #ffc107;
     }
-    #logo {
-      height: 40px;
-    }
     .site-title {
       font-size: 1.5em;
       font-weight: bold;
       color: #ffc107;
-      margin-left: 10px;
     }
     .profile-btn {
       background-color: #ffc107;
@@ -66,18 +62,18 @@
       cursor: pointer;
     }
     .games-section {
-      padding: 0 20px 40px;
+      padding: 0 20px 100px;
     }
     .games-section h2 {
       color: white;
-      margin-bottom: 15px;
+      margin: 15px 0;
       text-align: center;
     }
-    #gameList {
+    .game-row {
       display: flex;
       overflow-x: auto;
       gap: 15px;
-      padding-bottom: 10px;
+      padding-bottom: 15px;
       scroll-snap-type: x mandatory;
     }
     .game-item {
@@ -118,6 +114,10 @@
       text-align: center;
       font-size: 0.9em;
       border-top: 2px solid #333;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 1000;
     }
     footer a {
       color: #ffc107;
@@ -149,13 +149,13 @@
 
   <div class="games-section">
     <h2>NEW GAMES</h2>
-    <div id="gameList">Loading games...</div>
+    <div id="gameRows"></div>
   </div>
 
   <footer>
     IGS Game Platform © 2025<br/>
-    <a href="https://www.instagram.com/fogstudio18?igsh=bTU2OHgzMHFjM3A4">Instagram</a> | 
-    <a href="https://youtube.com/@fogstudio18?si=kHdZM1XqNJVOPc8H">Youtube</a> | 
+    <a href="https://www.instagram.com/fogstudio18?igsh=bTU2OHgzMHFjM3A4">Instagram</a> |
+    <a href="https://youtube.com/@fogstudio18?si=kHdZM1XqNJVOPc8H">Youtube</a> |
     <a href="https://t.me/gkfog1">Telegram</a>
   </footer>
 
@@ -180,25 +180,20 @@
     const auth = getAuth(app);
 
     async function loadSiteInfo() {
-      try {
-        const docRef = doc(db, "index", "index");
-        const docSnap = await getDoc(docRef);
+      const docRef = doc(db, "index", "index");
+      const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const logoUrl = data.logoUrl;
-          const videoUrl = data.videoUrl;
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const videoUrl = data.videoUrl;
+        const youtubePlayer = document.getElementById("youtubePlayer");
 
-          const youtubePlayer = document.getElementById("youtubePlayer");
-          if (youtubePlayer && videoUrl) {
-            const videoId = extractYouTubeID(videoUrl);
-            if (videoId) {
-              youtubePlayer.src = `https://www.youtube.com/embed/${videoId}`;
-            }
+        if (youtubePlayer && videoUrl) {
+          const videoId = extractYouTubeID(videoUrl);
+          if (videoId) {
+            youtubePlayer.src = `https://www.youtube.com/embed/${videoId}`;
           }
         }
-      } catch (error) {
-        console.error("Error loading site info:", error);
       }
     }
 
@@ -209,41 +204,56 @@
     }
 
     async function displayAllGames() {
-      const gameListContainer = document.getElementById('gameList');
-      gameListContainer.innerHTML = '';
+      const gameRowsContainer = document.getElementById('gameRows');
+      gameRowsContainer.innerHTML = '';
 
       try {
         const gamesCollectionRef = collection(db, 'games');
         const querySnapshot = await getDocs(gamesCollectionRef);
 
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            const game = doc.data();
+        const games = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          data.id = doc.id;
+          games.push(data);
+        });
+
+        const maxGames = 30;
+        const gamesToShow = games.slice(0, maxGames);
+
+        for (let i = 0; i < 6; i++) {
+          const row = document.createElement('div');
+          row.className = 'game-row';
+          for (let j = 0; j < 5; j++) {
+            const index = i * 5 + j;
+            if (index >= gamesToShow.length) break;
+
+            const game = gamesToShow[index];
             const gameItem = document.createElement('a');
-            gameItem.href = `gamed.html?id=${doc.id}`;
+            gameItem.href = `gamed.html?id=${game.id}`;
             gameItem.classList.add('game-item');
             gameItem.style.backgroundImage = `url('${game.gameLogoUrl || 'placeholder-game.png'}')`;
 
-            const infoContainer = document.createElement('div');
-            infoContainer.classList.add('game-info');
+            const info = document.createElement('div');
+            info.className = 'game-info';
 
             const gameName = document.createElement('p');
             gameName.textContent = game.gameName || 'Untitled Game';
-            infoContainer.appendChild(gameName);
+            info.appendChild(gameName);
 
-            const userName = document.createElement('p');
-            userName.textContent = `By ${game.uploaderName || 'Unknown'}`;
-            infoContainer.appendChild(userName);
+            const uploaderName = document.createElement('p');
+            uploaderName.textContent = `By ${game.uploaderName || 'Unknown'}`;
+            info.appendChild(uploaderName);
 
-            gameItem.appendChild(infoContainer);
-            gameListContainer.appendChild(gameItem);
-          });
-        } else {
-          gameListContainer.textContent = 'No games uploaded yet.';
+            gameItem.appendChild(info);
+            row.appendChild(gameItem);
+          }
+          gameRowsContainer.appendChild(row);
         }
+
       } catch (error) {
-        console.error('Error fetching games:', error);
-        gameListContainer.textContent = 'Failed to load games.';
+        console.error("Error loading games:", error);
+        gameRowsContainer.textContent = 'Failed to load games.';
       }
     }
 
