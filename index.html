@@ -195,14 +195,14 @@
         if (youtubePlayer && videoUrl) {
           const videoId = extractYouTubeID(videoUrl);
           if (videoId) {
-            youtubePlayer.src = `https://www.youtu.be/embed/${videoId}`;
+            youtubePlayer.src = `https://youtu.be/Ndh-vY3E1dw?si=KJaSmzjrOGus6bGE${videoId}`;
           }
         }
       }
     }
 
     function extractYouTubeID(url) {
-      const regex = /(?:youtube.com.*v=|youtu.be\/)([^&#]+)/;
+      const regex = /(?:youtube\.com.*v=|youtu\.be\/)([^&#]+)/;
       const match = url.match(regex);
       return match ? match[1] : null;
     }
